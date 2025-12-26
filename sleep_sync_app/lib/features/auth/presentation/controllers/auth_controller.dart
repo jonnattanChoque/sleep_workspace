@@ -58,7 +58,7 @@ class AuthController extends StateNotifier<AuthState> {
         isLoading: false, 
         isEmailVerificationSent: true,
         successMessage: AppStrings.verificationSent,
-        background: TwonColors.success,
+        background: TwonDSColors.success,
         timestamp: DateTime.now()
       );
     } catch (e) {
@@ -101,7 +101,7 @@ class AuthController extends StateNotifier<AuthState> {
       state = state.copyWith(
         isLoading: false, 
         successMessage: AppStrings.resetPasswordSent,
-        background: TwonColors.success,
+        background: TwonDSColors.success,
         timestamp: DateTime.now()
       );
     } catch (e) {
@@ -142,7 +142,7 @@ class AuthController extends StateNotifier<AuthState> {
     state = state.copyWith(
       isLoading: false, 
       error: message, 
-      background: TwonColors.error,
+      background: TwonDSColors.error,
       timestamp: DateTime.now()
     );
   }
@@ -151,7 +151,7 @@ class AuthController extends StateNotifier<AuthState> {
     state = state.copyWith(
       isLoading: false,
       error: message,
-      background: TwonColors.error,
+      background: TwonDSColors.error,
       timestamp: DateTime.now(),
     );
   }

@@ -34,4 +34,34 @@ class AppStrings {
   static const String verificationTitle = 'Verifica tu correo';
   static const String verificationMessage = 'Te hemos enviado un enlace de confirmación. Por favor, revisa tu bandeja de entrada (o spam) para activar tu cuenta.';
   static const String backToLogin = 'Volver al Login';
+  static const String confirmTitle = '¿Cerrar sesión?';
+  static const String confirmMessage = 'Tendrás que volver a ingresar para ver tus datos de sueño.';
+  static const String confirmAction = 'Cerrar sesión';
+
+  // Dashboard sin vínculo
+  static const unlinkedTitle = 'Mejor en pareja';
+  static const unlinkedSubtitle = 'Sincroniza tu descanso y cuida de quien más quieres.';
+  static const yourLinkCode = 'TU CÓDIGO DE VÍNCULACIÓN';
+  static const copy = 'Copiar';
+  static const share = 'Enviar';
+  static const step1 = 'Comparte este código con tu pareja.';
+  static const step2 = 'Tu pareja lo ingresa en su aplicación.';
+  static const step3 = '¡Empiecen a sincronizar su sueño!';
+  static const haveCodeAction = 'Ya tengo un código';
+  static const copiedCode = '¡Código copiado al portapapeles!';
+  static const shareCodeMessage = '¡Hola! Vincúlate conmigo en Twon para sincronizar nuestro descanso. Mi código es: SSJC-8X2K';
+  // static const linkPartnerTitle = 'Vincular con tu pareja';
+  // static const linkPartnerSubtitle = 'Ingresa el código que te ha compartido tu pareja para comenzar a sincronizar su descanso.';
+  // static const enterLinkCodeHint = 'Ingresa el código de vínculo';
+  // static const linkAction = 'Vincular';
+  // static const invalidLinkCode = 'El código ingresado no es válido. Por favor, verifica e intenta de nuevo.';
+  // static const linkingInProgress = 'Vinculando con tu pareja...';
+  // static const linkedSuccess = '¡Vinculación exitosa! Ahora pueden sincronizar su sueño juntos.';
+  // static const linkedError = 'No se pudo vincular con tu pareja. Por favor, intenta de nuevo más tarde.';
+
+  
+  // Tabs
+  static const tabToday = 'Hoy';
+  static const tabHistory = 'Historial';
+  static const tabProfile = 'Perfil';
 }

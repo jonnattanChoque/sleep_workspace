@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       title: AppStrings.title,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        scaffoldBackgroundColor: TwonColors.background,
+        scaffoldBackgroundColor: TwonDSColors.background,
         useMaterial3: true,
       ),
       home: const AuthWrapper(),

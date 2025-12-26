@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class TwonColors {
+class TwonDSColors {
   // Colores principales (Inspirados en la noche/sueño)
   static const Color primaryNight = Color(0xFF1A237E); // Azul profundo
   static const Color accentMoon = Color(0xFFFFD54F);    // Amarillo luna

@@ -32,14 +32,14 @@ class _TwonTextFieldState extends State<TwonTextField> {
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         filled: true,
-        fillColor: TwonColors.surface,
+        fillColor: TwonDSColors.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
         ),
         hintText: widget.hint,
         hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
-        prefixIcon: Icon(widget.icon, color: TwonColors.accentMoon),
+        prefixIcon: Icon(widget.icon, color: TwonDSColors.accentMoon),
         suffixIcon: widget.isPassword
             ? IconButton(
                 icon: Icon(
