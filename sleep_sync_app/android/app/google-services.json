@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "503700924110",
+    "project_id": "sleepapp-65909",
+    "storage_bucket": "sleepapp-65909.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:503700924110:android:d30e2cf3eab4f5792dd29f",
+        "android_client_info": {
+          "package_name": "com.example.sleep_sync_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "503700924110-jchasdq7h1gncp9unlrejcvl2c3ckmri.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1Mnzv6yr7DFlOWE7-4lflVyiHdq8Q26Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "503700924110-jchasdq7h1gncp9unlrejcvl2c3ckmri.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "503700924110-jea0dk6t9rr5ctaptumqapiorace1cjg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.twon.sleepSyncApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:503700924110:android:c448a3f7d6bc61b82dd29f",
+        "android_client_info": {
+          "package_name": "com.twon.sleepapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "503700924110-u9k7r8hum78o7s9es4395rcnjk6sa8a7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.twon.sleepapp",
+            "certificate_hash": "a7810fba47ddb90917eaf0f85187286ada97b25a"
+          }
+        },
+        {
+          "client_id": "503700924110-jchasdq7h1gncp9unlrejcvl2c3ckmri.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1Mnzv6yr7DFlOWE7-4lflVyiHdq8Q26Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "503700924110-jchasdq7h1gncp9unlrejcvl2c3ckmri.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "503700924110-jea0dk6t9rr5ctaptumqapiorace1cjg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.twon.sleepSyncApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
