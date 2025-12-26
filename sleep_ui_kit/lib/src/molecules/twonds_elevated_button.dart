@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../sleep_ui_kit.dart';
+import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
-class TwonButton extends StatelessWidget {
+class TwonDSElevatedButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
   final bool isLoading;
 
-  const TwonButton({
+  const TwonDSElevatedButton({
     super.key, 
     required this.text, 
     required this.onPressed,
@@ -21,14 +21,14 @@ class TwonButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: TwonColors.primaryNight,
+          backgroundColor: TwonDSColors.primaryNight,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           elevation: 0,
         ),
         child: isLoading 
           ? const CircularProgressIndicator(color: Colors.white)
-          : Text(text, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          : Text(text, style: TwonDSTextStyles.buttonLarge),
       ),
     );
   }

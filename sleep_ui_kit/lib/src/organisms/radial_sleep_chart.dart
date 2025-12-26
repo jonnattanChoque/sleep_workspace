@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../sleep_ui_kit.dart';
+import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
 class RadialSleepChart extends StatelessWidget {
   final double userProgress;    
@@ -27,19 +27,17 @@ class RadialSleepChart extends StatelessWidget {
               startDegreeOffset: 270,
               sectionsSpace: 0,
               centerSpaceRadius: 100,
-              sections: _createSections(userProgress, TwonColors.primaryNight),
+              sections: _createSections(userProgress, TwonDSColors.primaryNight),
             ),
           ),
-          // Anillo Interior: Pareja
           PieChart(
             PieChartData(
               startDegreeOffset: 270,
               sectionsSpace: 0,
               centerSpaceRadius: 75,
-              sections: _createSections(partnerProgress, TwonColors.partnerColor),
+              sections: _createSections(partnerProgress, TwonDSColors.partnerColor),
             ),
           ),
-          // Centro con información
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -72,7 +70,7 @@ class RadialSleepChart extends StatelessWidget {
         badgeWidget: progress > 0.9 ? const Icon(Icons.star, color: Colors.white, size: 12) : null,
       ),
       PieChartSectionData(
-        color: TwonColors.surface,
+        color: TwonDSColors.surface,
         value: 1 - progress,
         showTitle: false,
         radius: 18,

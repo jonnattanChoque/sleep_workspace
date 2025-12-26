@@ -15,7 +15,7 @@ class VerificationPendingScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.mark_email_read_outlined, size: 100, color: TwonColors.accentMoon),
+            const Icon(Icons.mark_email_read_outlined, size: 100, color: TwonDSColors.accentMoon),
             const SizedBox(height: 32),
             const Text(
               AppStrings.verificationTitle,
@@ -30,7 +30,7 @@ class VerificationPendingScreen extends ConsumerWidget {
             const SizedBox(height: 40),
             TextButton(
               onPressed: () => ref.read(authControllerProvider.notifier).signOut(),
-              child: const Text(AppStrings.backToLogin, style: TextStyle(color: TwonColors.accentMoon)),
+              child: const Text(AppStrings.backToLogin, style: TextStyle(color: TwonDSColors.accentMoon)),
             ),
           ],
         ),

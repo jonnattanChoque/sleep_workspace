@@ -58,7 +58,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     });
     
-
     final authState = ref.watch(authControllerProvider);
 
     return Scaffold(
@@ -70,19 +69,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             children: [
               const Text(
                 AppStrings.title,
-                style: TextStyle(
-                  color: TwonColors.accentMoon, 
-                  fontSize: 40, 
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 4,
-                ),
+                style: TwonDSTextStyles.brandLogo
               ),
               const SizedBox(height: 8),
-              const Icon(Icons.nights_stay, size: 80, color: TwonColors.accentMoon),
+              const Icon(TwonDSIcons.sleep, size: 80, color: TwonDSColors.accentMoon),
               const SizedBox(height: 32),
               Text(
                 isLogin ? AppStrings.loginWelcome : AppStrings.registerTitle,
-                style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                style: TwonDSTextStyles.h1,
               ),
               const SizedBox(height: 32),
               AnimatedSwitcher(
@@ -102,7 +96,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       children: [
                         TwonTextField(
                           hint: AppStrings.nameHint, 
-                          icon: Icons.person, 
+                          icon: TwonDSIcons.profile, 
                           controller: nameController,
                         ),
                         const SizedBox(height: 16),
@@ -110,9 +104,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     )
                   : const SizedBox(key: ValueKey('empty')),
               ),
-              TwonTextField(hint: AppStrings.emailLabel, icon: Icons.email, controller: emailController),
+              TwonTextField(hint: AppStrings.emailLabel, icon: TwonDSIcons.email, controller: emailController),
               const SizedBox(height: 16),
-              TwonTextField(hint: AppStrings.passwordLabel, icon: Icons.lock, controller: passwordController, isPassword: true),
+              TwonTextField(hint: AppStrings.passwordLabel, icon: TwonDSIcons.lock, controller: passwordController, isPassword: true),
               const SizedBox(height: 10),
               isLogin
                 ? Align(
@@ -128,14 +122,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap, 
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
+                      child: const Padding(
+                        padding: EdgeInsets.only(bottom: 4),
                         child: Text(
                           AppStrings.forgotPassword,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7), 
-                            fontWeight: FontWeight.normal,
-                          ),
+                          style: TwonDSTextStyles.labelHighlight,
                         ),
                       ),
                     ),
@@ -144,8 +135,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               const SizedBox(height: 24),
               
               authState.isLoading 
-                ? const CircularProgressIndicator(color: TwonColors.accentMoon)
-                : TwonButton(
+                ? const CircularProgressIndicator(color: TwonDSColors.accentMoon)
+                : TwonDSElevatedButton(
                     text: isLogin ? AppStrings.loginAction : AppStrings.registerAction, 
                     onPressed: () {
                       final controller = ref.read(authControllerProvider.notifier);
@@ -179,19 +170,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: Text.rich(
                     TextSpan(
                       text: isLogin ? AppStrings.noAccount : AppStrings.alreadyHaveAccount,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7), 
-                        fontWeight: FontWeight.normal,
-                      ),
+                      style: TwonDSTextStyles.bodySmall,
                       children: [
                         TextSpan(
                           text: isLogin ? AppStrings.registerAction : AppStrings.loginAction,
-                          style: const TextStyle(
-                            color: TwonColors.accentMoon,
-                            fontWeight: FontWeight.bold,
-                            height: 1.9, 
-                            decoration: TextDecoration.underline,
-                          ),
+                          style: TwonDSTextStyles.labelHighlight,
                         ),
                       ],
                     ),
@@ -233,12 +216,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         side: const BorderSide(color: Colors.white24),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      icon: Image.network( // O usa Image.asset si tienes el archivo
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1200px-Google_%22G%22_logo.svg.png',
+      icon: Image.network(
+        TwonDSAssets.googleLogoUrl,
         height: 20,
       ),
       label: const Text(
-        "Continuar con Google",
+        AppStrings.googleContinue,
         style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
       ),
     );
