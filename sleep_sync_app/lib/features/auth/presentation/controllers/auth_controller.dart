@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
+import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
 import 'package:sleep_sync_app/features/auth/domain/repositories/i_auth_repository.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
-import 'package:sleep_sync_app/features/auth/domain/auth_failure.dart';
+import 'package:sleep_sync_app/features/auth/domain/enums/auth_failure.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
-/// 1. Definición del Estado de la Autenticación
 class AuthState {
   final bool isLoading;
   final String? error;
   final String? successMessage;
   final Color background;
   final DateTime? timestamp;
+  final AppUser? user;
 
   AuthState({
     this.isLoading = false,
@@ -20,6 +21,7 @@ class AuthState {
     this.successMessage,
     this.background = Colors.transparent,
     this.timestamp,
+    this.user,
   });
 
   factory AuthState.initial() => AuthState();
@@ -31,6 +33,7 @@ class AuthState {
     Color? background,
     bool? isEmailVerificationSent,
     DateTime? timestamp,
+    final AppUser? user
   }) {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,
@@ -38,6 +41,7 @@ class AuthState {
       successMessage: successMessage,
       background: background ?? this.background,
       timestamp: timestamp ?? this.timestamp,
+      user: user ?? this.user,
     );
   }
 }
@@ -45,7 +49,23 @@ class AuthState {
 class AuthController extends StateNotifier<AuthState> {
   final IAuthRepository _authRepository;
 
-  AuthController(this._authRepository) : super(AuthState.initial());
+  AuthController(this._authRepository) : super(AuthState.initial()) {
+    _initialSync();
+  }
+
+  Future<void> _initialSync() async {
+    await syncUserStatus();
+  }
+
+  Future<void> syncUserStatus({bool force = false}) async {
+    if (!force && state.user?.partnerId != null) {
+      return;
+    }
+    final appUser = await _authRepository.getAuthenticatedUserData();
+    if (appUser != null) {
+      state = state.copyWith(user: appUser);
+    }
+  }
 
   Future<void> signUp(String email, String password, String name) async {
     if (!_validate(email, password, name)) return;
@@ -53,7 +73,7 @@ class AuthController extends StateNotifier<AuthState> {
     _initState();
     
     try {
-      await _authRepository.signUpWithEmail(email.trim(), password.trim());
+      await _authRepository.signUpWithEmail(email.trim(), password.trim(), name.trim());
       state = state.copyWith(
         isLoading: false, 
         isEmailVerificationSent: true,
@@ -176,6 +196,7 @@ class AuthController extends StateNotifier<AuthState> {
       AuthFailure.networkError      => AppStrings.errorNetwork,
       AuthFailure.cancelledByUser   => AppStrings.errorCancelled,
       AuthFailure.unknown           => AppStrings.errorGeneral,
+      AuthFailure.invalidCredential => AppStrings.invalidCredential,
     };
   }
 }

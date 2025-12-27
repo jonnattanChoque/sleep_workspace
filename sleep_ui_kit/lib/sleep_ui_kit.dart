@@ -8,3 +8,4 @@ export 'src/molecules/twonds_action_button.dart';
 export 'src/molecules/twonds_step_row.dart';
 export 'src/molecules/twonds_confirm_dialog.dart';
 export 'src/organisms/radial_sleep_chart.dart';
+export 'src/organisms/twonds_input_dialog_modal.dart';

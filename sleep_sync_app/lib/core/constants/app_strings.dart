@@ -9,6 +9,7 @@ class AppStrings {
   // Error Messages (Públicos)
   static const errorEmptyFields = "Por favor, completa todos los campos para continuar.";
   static const errorInvalidEmail = "El formato del correo electrónico no es válido.";
+  static const invalidCredential = "Las credenciales proporcionadas no son válidas.";
   static const errorShortPassword = "La contraseña debe tener al menos 6 caracteres.";
   static const errorUserNotFound = "No encontramos una cuenta con ese correo.";
   static const errorWrongPassword = "La contraseña es incorrecta.";
@@ -49,15 +50,15 @@ class AppStrings {
   static const step3 = '¡Empiecen a sincronizar su sueño!';
   static const haveCodeAction = 'Ya tengo un código';
   static const copiedCode = '¡Código copiado al portapapeles!';
-  static const shareCodeMessage = '¡Hola! Vincúlate conmigo en Twon para sincronizar nuestro descanso. Mi código es: SSJC-8X2K';
-  // static const linkPartnerTitle = 'Vincular con tu pareja';
-  // static const linkPartnerSubtitle = 'Ingresa el código que te ha compartido tu pareja para comenzar a sincronizar su descanso.';
-  // static const enterLinkCodeHint = 'Ingresa el código de vínculo';
-  // static const linkAction = 'Vincular';
-  // static const invalidLinkCode = 'El código ingresado no es válido. Por favor, verifica e intenta de nuevo.';
-  // static const linkingInProgress = 'Vinculando con tu pareja...';
-  // static const linkedSuccess = '¡Vinculación exitosa! Ahora pueden sincronizar su sueño juntos.';
-  // static const linkedError = 'No se pudo vincular con tu pareja. Por favor, intenta de nuevo más tarde.';
+  static const shareCodeMessage = '¡Hola! Vincúlate conmigo en Sleep Sync para sincronizar nuestro descanso. Mi código es: ';
+  static const creatingCode = 'Creando código...';
+  static const linkPartnerTitle = 'Vincular con tu pareja';
+  static const linkPartnerSubtitle = "Ingresa el código que aparece en el dispositivo de tu pareja para comenzar.";
+  static const enterLinkCodeHint = 'Ingresa el código de vínculación';
+  static const linkAction = 'Vincular';
+  static const errorInvalidLinkCode = 'El código ingresado no existe. Verifica y vuelve a intentarlo.';
+  static const errorLinkedWithSelf = 'No puedes vincularte con tu propio código.';
+  static const errorPartnerAlreadyLinked = 'Esta persona ya está vinculada con alguien más.';
 
   
   // Tabs

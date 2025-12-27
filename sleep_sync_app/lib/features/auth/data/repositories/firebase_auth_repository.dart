@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sleep_sync_app/features/auth/domain/app_user.dart';
-import 'package:sleep_sync_app/features/auth/domain/auth_failure.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
+import 'package:sleep_sync_app/features/auth/domain/enums/auth_failure.dart';
 import 'package:sleep_sync_app/features/auth/domain/repositories/i_auth_repository.dart';
 
 class FirebaseAuthRepository implements IAuthRepository {
@@ -11,10 +12,54 @@ class FirebaseAuthRepository implements IAuthRepository {
 
   @override
   Stream<AppUser?> get onAuthStateChanged {
-    return _auth.authStateChanges().map((user) {
-      if (user == null) return null;
-      return AppUser(uid: user.uid, email: user.email ?? '', verifiedEmail: user.emailVerified);
+    return _auth.authStateChanges().switchMap((firebaseUser) {
+      if (firebaseUser == null) {
+        return Stream.value(null);
+      }
+
+      return _db
+          .collection('users')
+          .doc(firebaseUser.uid)
+          .snapshots()
+          .map((snapshot) {
+        final data = snapshot.data();
+        return AppUser(
+          uid: firebaseUser.uid,
+          email: firebaseUser.email ?? '',
+          verifiedEmail: firebaseUser.emailVerified,
+          partnerId: data?['partnerId'] as String?,
+        );
+      });
     });
+  }
+
+  @override
+  Future<AppUser?> getAuthenticatedUserData() async {
+    final firebaseUser = _auth.currentUser;
+    
+    if (firebaseUser == null) return null;
+
+    try {
+      final doc = await _db.collection('users').doc(firebaseUser.uid).get();
+      
+      if (doc.exists) {
+        final data = doc.data();
+        return AppUser(
+          uid: firebaseUser.uid,
+          email: firebaseUser.email ?? '',
+          verifiedEmail: firebaseUser.emailVerified,
+          partnerId: data?['partnerId'] as String?,
+        );
+      }
+
+      return AppUser(
+        uid: firebaseUser.uid,
+        email: firebaseUser.email ?? '',
+        verifiedEmail: firebaseUser.emailVerified,
+      );
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
@@ -29,7 +74,7 @@ class FirebaseAuthRepository implements IAuthRepository {
   }
 
   @override
-  Future<void> signUpWithEmail(String email, String password) async {
+  Future<void> signUpWithEmail(String email, String password, String name) async {
     try {
       final credential = await _auth.createUserWithEmailAndPassword(
         email: email, 
@@ -40,8 +85,8 @@ class FirebaseAuthRepository implements IAuthRepository {
       await _db.collection('users').doc(uid).set({
         'email': email,
         'uid': uid,
+        'name': name,
         'partnerId': null,
-        'pairingCode': uid.substring(0, 6).toUpperCase(),
         'createdAt': FieldValue.serverTimestamp(),
       });
       
@@ -75,7 +120,6 @@ class FirebaseAuthRepository implements IAuthRepository {
           'email': user.email,
           'uid': user.uid,
           'partnerId': null,
-          'pairingCode': user.uid.substring(0, 6).toUpperCase(),
           'createdAt': FieldValue.serverTimestamp(),
         });
       }
@@ -111,6 +155,7 @@ class FirebaseAuthRepository implements IAuthRepository {
 
   AuthFailure _handleAuthException(String code) {
     return switch (code) {
+      'invalid-credential' => AuthFailure.invalidCredential,
       'invalid-email' => AuthFailure.invalidEmail,
       'user-not-found' => AuthFailure.userNotFound,
       'wrong-password' => AuthFailure.wrongPassword,
