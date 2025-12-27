@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
+import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
+import 'package:sleep_sync_app/features/sleep/presentation/screens/linked_dashboard_screen.dart';
 import 'package:sleep_sync_app/features/sleep/presentation/screens/unlinked_dashboard_screen.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
@@ -32,8 +34,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authControllerProvider);
+    final user = authState.user;
+
     return Scaffold(
-      backgroundColor: TwonDSColors.primaryNight,
+      backgroundColor: TwonDSColors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -55,10 +60,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               Expanded(
                 child: IndexedStack(
                   index: _selectedIndex,
-                  children: const [
-                    UnlinkedDashboard(),
-                    Center(child: Text(AppStrings.tabHistory, style: TextStyle(color: Colors.white))),
-                    Center(child: Text(AppStrings.tabProfile, style: TextStyle(color: Colors.white))),
+                  children: [
+                    _getTodayTabContent(user),
+                    const Center(child: Text(AppStrings.tabHistory, style: TextStyle(color: Colors.white))),
+                    const Center(child: Text(AppStrings.tabProfile, style: TextStyle(color: Colors.white))),
                   ],
                 ),
               ),
@@ -69,7 +74,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
-        backgroundColor: TwonDSColors.primaryNight,
+        backgroundColor: TwonDSColors.background,
         selectedItemColor: TwonDSColors.accentMoon,
         unselectedItemColor: Colors.white24,
         showSelectedLabels: false,
@@ -79,6 +84,37 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.nights_stay_rounded), label: AppStrings.tabToday),
           BottomNavigationBarItem(icon: Icon(Icons.bar_chart_rounded), label: AppStrings.tabHistory),
           BottomNavigationBarItem(icon: Icon(Icons.person_outline_rounded), label: AppStrings.tabProfile),
+        ],
+      ),
+    );
+  }
+
+  Widget _getTodayTabContent(AppUser? user) {
+    if (user == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    
+    final hasPartner = user.partnerId != null && user.partnerId!.trim().isNotEmpty;
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        await ref.read(authControllerProvider.notifier).syncUserStatus(force: true);
+      },
+      color: TwonDSColors.accentMoon,
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: hasPartner 
+                  ? const LinkedDashboardScreen() 
+                  : const UnlinkedDashboard(),
+            ),
+          ),
         ],
       ),
     );

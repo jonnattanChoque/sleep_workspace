@@ -3,13 +3,13 @@
 import 'package:flutter/material.dart';
 import '../../sleep_ui_kit.dart';
 
-class TwonTextField extends StatefulWidget {
+class TwonDSTextField extends StatefulWidget {
   final String hint;
   final IconData icon;
   final TextEditingController controller;
   final bool isPassword;
 
-  const TwonTextField({
+  const TwonDSTextField({
     super.key,
     required this.hint,
     required this.icon,
@@ -18,10 +18,10 @@ class TwonTextField extends StatefulWidget {
   });
 
   @override
-  State<TwonTextField> createState() => _TwonTextFieldState();
+  State<TwonDSTextField> createState() => _TwonTextFieldState();
 }
 
-class _TwonTextFieldState extends State<TwonTextField> {
+class _TwonTextFieldState extends State<TwonDSTextField> {
   bool _obscureText = true;
 
   @override

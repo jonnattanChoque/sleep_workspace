@@ -28,21 +28,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _showTwonSnackBar(BuildContext context, String message, Color backgroundColor) {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            message,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
-          ),
-          backgroundColor: backgroundColor,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          duration: const Duration(seconds: 4),
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
         ),
-      );
-    }
+        backgroundColor: backgroundColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +94,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ? Column(
                       key: const ValueKey('nameField'),
                       children: [
-                        TwonTextField(
+                        TwonDSTextField(
                           hint: AppStrings.nameHint, 
                           icon: TwonDSIcons.profile, 
                           controller: nameController,
@@ -104,9 +104,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     )
                   : const SizedBox(key: ValueKey('empty')),
               ),
-              TwonTextField(hint: AppStrings.emailLabel, icon: TwonDSIcons.email, controller: emailController),
+              TwonDSTextField(hint: AppStrings.emailLabel, icon: TwonDSIcons.email, controller: emailController),
               const SizedBox(height: 16),
-              TwonTextField(hint: AppStrings.passwordLabel, icon: TwonDSIcons.lock, controller: passwordController, isPassword: true),
+              TwonDSTextField(hint: AppStrings.passwordLabel, icon: TwonDSIcons.lock, controller: passwordController, isPassword: true),
               const SizedBox(height: 10),
               isLogin
                 ? Align(

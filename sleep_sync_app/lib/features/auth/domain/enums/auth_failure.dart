@@ -1,4 +1,5 @@
 enum AuthFailure {
+  invalidCredential,
   invalidEmail,
   userNotFound,
   wrongPassword,

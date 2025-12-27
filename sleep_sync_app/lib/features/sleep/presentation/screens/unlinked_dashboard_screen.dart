@@ -1,24 +1,24 @@
 // ignore_for_file: camel_case_types
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
+import 'package:sleep_sync_app/features/linking/presentation/linking_provider.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
-class UnlinkedDashboard extends StatelessWidget {
+class UnlinkedDashboard extends ConsumerWidget {
   const UnlinkedDashboard({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        return SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: const IntrinsicHeight(
-              child: _unlinkedDashboardContent(),
-            ),
+        return ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: const IntrinsicHeight(
+            child: _UnlinkedDashboardContent(),
           ),
         );
       },
@@ -26,11 +26,78 @@ class UnlinkedDashboard extends StatelessWidget {
   }
 }
 
-class _unlinkedDashboardContent extends StatelessWidget {
-  const _unlinkedDashboardContent();
+class _UnlinkedDashboardContent extends ConsumerStatefulWidget {
+  const _UnlinkedDashboardContent();
+
+  @override
+  ConsumerState<_UnlinkedDashboardContent> createState() => _UnlinkedDashboardContentState();
+}
+
+class _UnlinkedDashboardContentState extends ConsumerState<_UnlinkedDashboardContent> {
+  
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => 
+      ref.read(linkingControllerProvider.notifier).initLinkingFlow()
+    );
+  }
+
+  void _showLinkModal(BuildContext context) {
+    final TextEditingController codeController = TextEditingController();
+    TwnDSInputDialogModal.show(
+      context: context,
+      title: AppStrings.linkPartnerTitle,
+      description: AppStrings.linkPartnerSubtitle,
+      inputField: TwonDSTextField(
+        hint: AppStrings.enterLinkCodeHint, 
+        icon: TwonDSIcons.link, 
+        controller: codeController
+      ),
+      actionButton: TwonDSElevatedButton(
+        text: AppStrings.linkAction,
+        onPressed: () async {
+          final code = codeController.text.trim();
+          
+          if (code.isNotEmpty) {
+            Navigator.pop(context);
+            await ref.read(linkingControllerProvider.notifier).linkWithPartner(code);
+          }
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final linkingState = ref.watch(linkingControllerProvider);
+    final code = linkingState.valueOrNull;
+    final isLoading = linkingState.isLoading;
+
+    ref.listen<AsyncValue>(linkingControllerProvider, (previous, next) {
+        if (next is AsyncError && previous is! AsyncError) {
+          final errorMessage = next.error.toString();
+          
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage), 
+              backgroundColor: TwonDSColors.error,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              duration: const Duration(seconds: 2),
+              margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+            ),
+          );
+        }
+        if (previous is AsyncLoading && next is AsyncData) {
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+          }
+        }
+      },
+    );
+    
     return Column(
       children: [
         const Icon(TwonDSIcons.logoHeader, size: 70, color: TwonDSColors.accentMoon),
@@ -57,10 +124,22 @@ class _unlinkedDashboardContent extends StatelessWidget {
                 AppStrings.yourLinkCode, 
                 style: TwonDSTextStyles.labelHighlight),
               const SizedBox(height: 20),
-              const Text(
-                'SSJC-8X2K',
-                style: TwonDSTextStyles.displayCode,
-              ),
+              if (isLoading)
+                Column(
+                  children: [
+                    const CircularProgressIndicator(color: TwonDSColors.accentMoon),
+                    const SizedBox(height: 10),
+                    Text(
+                      AppStrings.creatingCode,
+                      style: TwonDSTextStyles.bodySmall.copyWith(color: TwonDSColors.accentMoon),
+                    ),
+                  ],
+                )
+              else
+                Text(
+                  code ?? '---',
+                  style: TwonDSTextStyles.displayCode,
+                ),
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -69,10 +148,11 @@ class _unlinkedDashboardContent extends StatelessWidget {
                     icon: TwonDSIcons.copy, 
                     label: AppStrings.copy, 
                     onTap: () {
-                      Clipboard.setData(const ClipboardData(text: "SSJC-8X2K")).then((_) {
+                      Clipboard.setData(ClipboardData(text: code ?? "")).then((_) {
                         if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
+                            backgroundColor: TwonDSColors.success,
                             content: Text(AppStrings.copiedCode),
                             duration: Duration(seconds: 2),
                           ),
@@ -85,7 +165,7 @@ class _unlinkedDashboardContent extends StatelessWidget {
                     icon: TwonDSIcons.share,
                     label: AppStrings.share,
                     onTap: () {
-                      const String shareText = AppStrings.shareCodeMessage;
+                      final String shareText = "${AppStrings.shareCodeMessage} $code";
                       SharePlus.instance.share(ShareParams(text: shareText));
                     },
                   ),
@@ -106,7 +186,7 @@ class _unlinkedDashboardContent extends StatelessWidget {
         TwonDSElevatedButton(
           text: AppStrings.haveCodeAction,
           onPressed: () {
-            // Aquí abriremos el modal para vincular
+            _showLinkModal(context);
           },
         ),
         const SizedBox(height: 24),
