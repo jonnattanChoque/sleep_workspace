@@ -14,7 +14,7 @@ class TwonDSStepRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

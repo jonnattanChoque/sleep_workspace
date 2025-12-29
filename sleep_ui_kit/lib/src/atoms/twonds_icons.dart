@@ -4,6 +4,7 @@ class TwonDSIcons {
   // Identidad
   static const IconData logoHeader = Icons.favorite_border_rounded;
   static const IconData logout = Icons.logout_rounded;
+  static const IconData person = Icons.person_rounded;
   
   // Acciones de Vinculación
   static const IconData copy = Icons.copy_all_rounded;
@@ -20,4 +21,5 @@ class TwonDSIcons {
   static const IconData check = Icons.check_circle_rounded;
   static const IconData email = Icons.email;
   static const IconData lock = Icons.lock;
+  static const IconData edit = Icons.edit_rounded;
 }

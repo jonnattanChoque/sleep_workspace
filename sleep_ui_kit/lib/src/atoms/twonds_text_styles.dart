@@ -56,6 +56,12 @@ class TwonDSTextStyles {
     fontWeight: FontWeight.w500,
   );
 
+  static const TextStyle textSmall = TextStyle(
+    color: Colors.white38,
+    fontSize: 10,
+    fontWeight: FontWeight.w500,
+  );
+
   static const TextStyle buttonLarge = TextStyle(
     color: Colors.white,
     fontSize: 18,

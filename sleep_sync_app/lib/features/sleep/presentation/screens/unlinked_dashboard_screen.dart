@@ -12,17 +12,7 @@ class UnlinkedDashboard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return ConstrainedBox(
-          constraints: BoxConstraints(minHeight: constraints.maxHeight),
-          child: const IntrinsicHeight(
-            child: _UnlinkedDashboardContent(),
-          ),
-        );
-      },
-    );
+    return const _UnlinkedDashboardContent();
   }
 }
 
@@ -99,8 +89,8 @@ class _UnlinkedDashboardContentState extends ConsumerState<_UnlinkedDashboardCon
     );
     
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(TwonDSIcons.logoHeader, size: 70, color: TwonDSColors.accentMoon),
         const SizedBox(height: 10),
         const Text(AppStrings.unlinkedTitle, style: TwonDSTextStyles.h1),
         const SizedBox(height: 12),
@@ -175,19 +165,15 @@ class _UnlinkedDashboardContentState extends ConsumerState<_UnlinkedDashboardCon
           ),
         ),
         
-        const SizedBox(height: 18),
-        
+        const SizedBox(height: 25),
         const TwonDSStepRow(number: '1', text: AppStrings.step1),
         const TwonDSStepRow(number: '2', text: AppStrings.step2),
         const TwonDSStepRow(number: '3', text: AppStrings.step3),
         
-        const Spacer(),
-        
+        const SizedBox(height: 20),
         TwonDSElevatedButton(
           text: AppStrings.haveCodeAction,
-          onPressed: () {
-            _showLinkModal(context);
-          },
+          onPressed: () => _showLinkModal(context),
         ),
         const SizedBox(height: 24),
       ],
