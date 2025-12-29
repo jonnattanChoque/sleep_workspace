@@ -59,10 +59,21 @@ class AppStrings {
   static const errorInvalidLinkCode = 'El código ingresado no existe. Verifica y vuelve a intentarlo.';
   static const errorLinkedWithSelf = 'No puedes vincularte con tu propio código.';
   static const errorPartnerAlreadyLinked = 'Esta persona ya está vinculada con alguien más.';
-
   
   // Tabs
   static const tabToday = 'Hoy';
   static const tabHistory = 'Historial';
   static const tabProfile = 'Perfil';
+
+  // Profile Screen
+  static const profileAverageSleep = 'Promedio';
+  static const profileSleepGoal = 'Meta de Sueño';
+  static const profileEditGoal = 'Editar Meta';
+  static const profileConfiguration = 'Configuración';
+  static const profileEditProfile = 'Editar Perfil';
+  static const profileTheme = "Modo Oscuro";
+  static const profilePush = 'Notificaciones';
+  static const profileLogout = 'Cerrar Sesión';
+  static const profileSliderUnlink = 'Desliza para desvincular';
+  static const profileSliderPlaceholder = 'Desvincular';
 }
