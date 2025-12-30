@@ -92,43 +92,62 @@ class _UnlinkedDashboardContentState extends ConsumerState<_UnlinkedDashboardCon
       mainAxisSize: MainAxisSize.min,
       children: [
         const SizedBox(height: 10),
-        const Text(AppStrings.unlinkedTitle, style: TwonDSTextStyles.h1),
+        Text(AppStrings.unlinkedTitle, style: TwonDSTextStyles.h1(context)),
         const SizedBox(height: 12),
-        const Text(
+        Text(
           AppStrings.unlinkedSubtitle, 
           textAlign: TextAlign.center, 
-          style: TwonDSTextStyles.bodyMedium,
+          style: TwonDSTextStyles.bodyMedium(context),
         ),
         const SizedBox(height: 18),
         
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: .03),
+            color: Theme.of(context).brightness == Brightness.dark 
+                ? Colors.white.withValues(alpha: .03) 
+                : Theme.of(context).colorScheme.surface,
+            
             borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)), 
+            border: Border.all(
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
+            ),
+            boxShadow: Theme.of(context).brightness == Brightness.light 
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  )
+                ]
+              : null,
           ),
           child: Column(
             children: [
-              const Text(
+              Text(
                 AppStrings.yourLinkCode, 
-                style: TwonDSTextStyles.labelHighlight),
+                style: TwonDSTextStyles.labelHighlight(context)
+              ),
               const SizedBox(height: 20),
               if (isLoading)
                 Column(
                   children: [
-                    const CircularProgressIndicator(color: TwonDSColors.accentMoon),
+                    CircularProgressIndicator(
+                      color: Theme.of(context).colorScheme.primary
+                    ),
                     const SizedBox(height: 10),
                     Text(
                       AppStrings.creatingCode,
-                      style: TwonDSTextStyles.bodySmall.copyWith(color: TwonDSColors.accentMoon),
+                      style: TwonDSTextStyles.bodySmall(context).copyWith(
+                        color: Theme.of(context).colorScheme.primary
+                      ),
                     ),
                   ],
                 )
               else
                 Text(
                   code ?? '---',
-                  style: TwonDSTextStyles.displayCode,
+                  style: TwonDSTextStyles.displayCode(context),
                 ),
               const SizedBox(height: 12),
               Row(

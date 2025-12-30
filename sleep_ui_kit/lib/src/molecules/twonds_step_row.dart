@@ -40,7 +40,7 @@ class TwonDSStepRow extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: TwonDSTextStyles.bodySmall,
+              style: TwonDSTextStyles.bodySmall(context),
             ),
           ),
         ],

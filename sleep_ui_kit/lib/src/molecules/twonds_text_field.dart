@@ -1,7 +1,4 @@
-// ignore_for_file: dead_code, no_leading_underscores_for_local_identifiers
-
 import 'package:flutter/material.dart';
-import '../../sleep_ui_kit.dart';
 
 class TwonDSTextField extends StatefulWidget {
   final String hint;
@@ -26,25 +23,31 @@ class _TwonTextFieldState extends State<TwonDSTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return TextField(
       controller: widget.controller,
       obscureText: widget.isPassword ? _obscureText : false,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: colorScheme.onSurface),
       decoration: InputDecoration(
         filled: true,
-        fillColor: TwonDSColors.surface,
+        fillColor: colorScheme.onSurface.withValues(alpha: 0.05),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
         ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
+        ),
         hintText: widget.hint,
-        hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
-        prefixIcon: Icon(widget.icon, color: TwonDSColors.accentMoon),
+        hintStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.5)),
+        prefixIcon: Icon(widget.icon, color: colorScheme.primary),
         suffixIcon: widget.isPassword
             ? IconButton(
                 icon: Icon(
                   _obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.white70,
+                  color: colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 onPressed: () {
                   setState(() {

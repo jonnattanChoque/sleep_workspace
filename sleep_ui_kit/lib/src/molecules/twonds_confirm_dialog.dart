@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sleep_ui_kit/src/atoms/twonds_colors.dart';
-import 'package:sleep_ui_kit/src/atoms/twonds_text_styles.dart';
+import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
 class TwnDSConfirmDialog extends StatelessWidget {
   final String title;
@@ -18,13 +17,15 @@ class TwnDSConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return AlertDialog(
-      backgroundColor: TwonDSColors.background,
+      backgroundColor: colorScheme.surface, 
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-      title: Text(title, style: TwonDSTextStyles.h2, textAlign: TextAlign.center),
+      title: Text(title, style: TwonDSTextStyles.h2(context), textAlign: TextAlign.center),
       content: Text(
         description,
-        style: TwonDSTextStyles.bodyMedium,
+        style: TwonDSTextStyles.bodyMedium(context),
         textAlign: TextAlign.center,
       ),
       actionsAlignment: MainAxisAlignment.center,
@@ -33,17 +34,20 @@ class TwnDSConfirmDialog extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
           child: Text(
             'Cancelar', 
-            style: TwonDSTextStyles.bodySmall.copyWith(color: Colors.white54)
+            style: TwonDSTextStyles.bodySmall(context).copyWith(
+              color: colorScheme.onSurface.withValues(alpha: 0.54),
+            )
           ),
         ),
         const SizedBox(width: 8),
         ElevatedButton(
           onPressed: onConfirm,
           style: ElevatedButton.styleFrom(
-            backgroundColor: TwonDSColors.accentMoon,
-            foregroundColor: Colors.black,
+            backgroundColor: colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            elevation: 0,
           ),
           child: Text(
             confirmText, 

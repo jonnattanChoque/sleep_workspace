@@ -4,36 +4,46 @@ import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 class TwonDSBadge extends StatelessWidget {
   final String text;
   final IconData? icon;
-  final Color? color;
+  final Color? customColor;
 
   const TwonDSBadge({
     super.key, 
     required this.text, 
     this.icon, 
-    this.color,
+    this.customColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = color ?? TwonDSColors.accentMoon;
+    final Color moonColor = TwonDSColors.accentMoon;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: baseColor.withValues(alpha: 0.1),
+        color: moonColor.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: moonColor.withValues(alpha: .6),
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 12, color: baseColor),
+            Icon(
+              icon, 
+              size: 12, 
+              color: TwonDSColors.primaryNight,
+            ),
             const SizedBox(width: 6),
           ],
           Text(
             text,
-            style: TwonDSTextStyles.labelHighlight.copyWith(
+            style: TwonDSTextStyles.labelHighlight(context).copyWith(
               fontSize: 11,
-              color: baseColor,
+              color: TwonDSColors.primaryNight,
+              fontWeight: FontWeight.w800,
             ),
           ),
         ],

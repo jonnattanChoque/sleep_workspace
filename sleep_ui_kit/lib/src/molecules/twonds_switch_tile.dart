@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
 class TwonDSSwitchTile extends StatelessWidget {
   final IconData icon;
@@ -17,20 +16,29 @@ class TwonDSSwitchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, color: Colors.white70, size: 22),
+      leading: Icon(
+        icon, 
+        color: colorScheme.onSurface.withValues(alpha: 0.7), 
+        size: 22
+      ),
       title: Text(
         title,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+        style: TextStyle(
+          color: colorScheme.onSurface, 
+          fontWeight: FontWeight.w500
+        ),
       ),
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeThumbColor: TwonDSColors.accentMoon,
-        activeTrackColor: TwonDSColors.accentMoon.withValues(alpha: 0.3),
-        inactiveThumbColor: Colors.white60,
-        inactiveTrackColor: Colors.white10,
+        activeThumbColor: colorScheme.primary, 
+        activeTrackColor: colorScheme.primary.withValues(alpha: 0.3),
+        inactiveThumbColor: colorScheme.onSurface.withValues(alpha: 0.6),
+        inactiveTrackColor: colorScheme.onSurface.withValues(alpha: 0.1),
       ),
     );
   }

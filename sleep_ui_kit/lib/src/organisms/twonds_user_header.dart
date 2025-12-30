@@ -17,13 +17,20 @@ class TwonDSUserHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
+
     return Container(
       margin: const EdgeInsets.only(top: 10),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.3),
+        color: isLight 
+            ? colorScheme.surface 
+            : Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(
+          color: colorScheme.onSurface.withValues(alpha: 0.1)
+        ),
       ),
       child: Row(
         children: [
@@ -33,8 +40,14 @@ class TwonDSUserHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: TwonDSTextStyles.h2.copyWith(color: Colors.black87)),
-                Text(email, style: TwonDSTextStyles.bodyMedium.copyWith(color: Colors.grey)),
+                Text(
+                  name, 
+                  style: TwonDSTextStyles.h2(context)
+                ),
+                Text(
+                  email, 
+                  style: TwonDSTextStyles.bodyMedium(context)
+                ),
                 if (bottomChild != null) ...[
                   const SizedBox(height: 12),
                   bottomChild!,

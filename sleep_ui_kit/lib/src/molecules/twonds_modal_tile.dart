@@ -18,14 +18,21 @@ class TwonDSModalTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final Color baseColor = color ?? colorScheme.onSurface;
+
     return ListTile(
       onTap: onTap,
       contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, color: color ?? Colors.white70, size: 22),
+      leading: Icon(
+        icon, 
+        color: baseColor.withValues(alpha: color != null ? 1.0 : 0.7), 
+        size: 22
+      ),
       title: Text(
         title,
         style: TextStyle(
-          color: color ?? Colors.white,
+          color: baseColor,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -35,10 +42,17 @@ class TwonDSModalTile extends StatelessWidget {
           if (trailing != null)
             Text(
               trailing!,
-              style: const TextStyle(color: Colors.white38, fontSize: 14),
+              style: TextStyle(
+                color: colorScheme.onSurface.withValues(alpha: 0.38), 
+                fontSize: 14
+              ),
             ),
           const SizedBox(width: 8),
-          const Icon(Icons.chevron_right, size: 18, color: Colors.white24),
+          Icon(
+            Icons.chevron_right, 
+            size: 18, 
+            color: colorScheme.onSurface.withValues(alpha: 0.24)
+          ),
         ],
       ),
     );

@@ -19,5 +19,7 @@ export 'src/molecules/twonds_switch_tile.dart';
 export 'src/organisms/radial_sleep_chart.dart';
 export 'src/organisms/twonds_input_dialog_modal.dart';
 export 'src/organisms/twonds_user_header.dart';
+export 'src/organisms/twonds_overlay_loader.dart';
 
 export 'src/templates/modal_layout.dart';
+export 'src/theme/twonds_theme.dart';

@@ -4,7 +4,7 @@ import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 class TwonDSStatCard extends StatelessWidget {
   final String title;
   final String value;
-  final Color valueColor;
+  final Color? valueColor;
   final double height;
   final IconData? iconTap;
   final VoidCallback onTap;
@@ -16,16 +16,30 @@ class TwonDSStatCard extends StatelessWidget {
     required this.onTap,
     this.iconTap,
     this.height = 140,
-    this.valueColor = const Color(0xFF3F51B5),
+    this.valueColor, 
   });
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color accentColor = TwonDSColors.accentMoon;
+
     return Container(
       height: height,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
+        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.3), 
         borderRadius: BorderRadius.circular(32),
+        border: Border.all(
+          color: colorScheme.onSurface.withValues(alpha: 0.1)
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -43,28 +57,29 @@ class TwonDSStatCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
-                        color: TwonDSColors.accentMoon, 
+                      style: TextStyle(
+                        color: isDark ? accentColor : colorScheme.onSurface, 
                         fontSize: 14, 
-                        fontWeight: FontWeight.w500
+                        fontWeight: FontWeight.w600
                       ),
                     ),
-                    Positioned(
-                      top: 16,
-                      right: 16,
-                      child: Icon(
-                        iconTap ?? Icons.arrow_forward_ios,
-                        size: 15,
-                        color: Colors.white70,
-                      ),
+                    Icon(
+                      iconTap ?? Icons.arrow_forward_ios,
+                      size: 15,
+                      color: isDark 
+                          ? colorScheme.onSurface.withValues(alpha: 0.7)
+                          : colorScheme.onSurface.withValues(alpha: 0.4),
                     ),
                   ]
                 ),
-                const SizedBox(height: 32), 
                 FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.bottomLeft,
                   child: Text(
                     value,
-                    style: TwonDSTextStyles.bodySmall,
+                    style: TwonDSTextStyles.h2(context).copyWith(
+                      color: valueColor ?? colorScheme.onSurface,
+                    ),
                   ),
                 ),
               ],

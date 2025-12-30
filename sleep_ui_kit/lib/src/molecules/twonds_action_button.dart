@@ -14,6 +14,8 @@ class TwonDSActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -24,13 +26,23 @@ class TwonDSActionButton extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: .05),
+                color: colorScheme.onSurface.withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: Colors.white, size: 20),
+              child: Icon(
+                icon, 
+                color: colorScheme.onSurface, 
+                size: 20
+              ),
             ),
             const SizedBox(height: 8),
-            Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+            Text(
+              label, 
+              style: TextStyle(
+                color: colorScheme.onSurface.withValues(alpha: 0.7), 
+                fontSize: 12
+              )
+            ),
           ],
         ),
       ),

@@ -15,20 +15,31 @@ class TwonDSElevatedButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: TwonDSColors.primaryNight,
-          foregroundColor: Colors.white,
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           elevation: 0,
+          disabledBackgroundColor: colorScheme.onSurface.withValues(alpha: 0.12),
         ),
         child: isLoading 
-          ? const CircularProgressIndicator(color: Colors.white)
-          : Text(text, style: TwonDSTextStyles.buttonLarge),
+          ? CircularProgressIndicator(
+              color: colorScheme.onPrimary, 
+              strokeWidth: 3,
+            )
+          : Text(
+              text,
+              style: TwonDSTextStyles.buttonLarge(context).copyWith(
+                color: colorScheme.onPrimary,
+              ),
+            ),
       ),
     );
   }
