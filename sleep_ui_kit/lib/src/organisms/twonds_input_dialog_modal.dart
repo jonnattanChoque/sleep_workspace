@@ -22,10 +22,12 @@ class TwnDSInputDialogModal extends StatelessWidget {
     required Widget inputField,
     required Widget actionButton,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return showModalBottomSheet<T>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: TwonDSColors.background,
+      backgroundColor: colorScheme.surface, 
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
@@ -40,6 +42,8 @@ class TwnDSInputDialogModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: EdgeInsets.only(
         left: 24,
@@ -54,21 +58,21 @@ class TwnDSInputDialogModal extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.3),
+              color: colorScheme.onSurface.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           const SizedBox(height: 32),
           Text(
             title,
-            style: TwonDSTextStyles.h2,
+            style: TwonDSTextStyles.h2(context),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
           Text(
             description,
             textAlign: TextAlign.center,
-            style: TwonDSTextStyles.labelHighlight,
+            style: TwonDSTextStyles.labelHighlight(context),
           ),
           const SizedBox(height: 32),
           inputField,

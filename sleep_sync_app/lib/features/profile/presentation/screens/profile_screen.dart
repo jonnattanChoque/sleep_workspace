@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
+import 'package:sleep_sync_app/core/provider/theme_provider.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -32,8 +33,25 @@ class ProfileScreen extends ConsumerWidget {
           TwonDSSwitchTile(
             icon: Icons.dark_mode_outlined,
             title: AppStrings.profileTheme,
-            value: true,
-            onChanged: (val) {},
+            value: ref.watch(themeModeProvider) == ThemeMode.dark,
+            onChanged: (bool isDarkMode) async {
+              final themeLoading = ref.read(themeLoadingProvider.notifier);
+              final themeMode = ref.read(themeModeProvider.notifier);
+              final storage = ref.read(storageServiceProvider);
+              
+              if (!context.mounted) return;
+              Navigator.pop(context);
+              await Future.delayed(const Duration(milliseconds: 250));
+
+              themeLoading.state = true;
+              await Future.delayed(const Duration(milliseconds: 800));
+
+              themeMode.state = isDarkMode ? ThemeMode.dark : ThemeMode.light;
+              await storage.setThemeMode(isDarkMode);
+              await Future.delayed(const Duration(milliseconds: 1200));
+              
+              themeLoading.state = false;
+            },
           ),
           const Divider(color: Colors.white10),
           TwonDSModalTile(
@@ -76,19 +94,16 @@ class ProfileScreen extends ConsumerWidget {
 }
 
   Widget _buildIdentityCard() {
-    return TwonDSUserHeader(
+    return const TwonDSUserHeader(
       name: "", 
       email: "",
       avatar: TwonDSAvatar(
         imageUrl: "",
         radius: 30,
-        backgroundColor: Colors.grey[200], 
-        iconColor: Colors.grey,
       ),
-      bottomChild: const TwonDSBadge(
+      bottomChild: TwonDSBadge(
         text: "",
         icon: TwonDSIcons.link,
-        color: TwonDSColors.partnerColor,
       )
     );
   }

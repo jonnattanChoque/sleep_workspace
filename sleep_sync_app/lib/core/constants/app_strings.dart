@@ -76,4 +76,5 @@ class AppStrings {
   static const profileLogout = 'Cerrar Sesión';
   static const profileSliderUnlink = 'Desliza para desvincular';
   static const profileSliderPlaceholder = 'Desvincular';
+  static const profileChangingTheme = "Sincronizando tu modo...";
 }

@@ -1,28 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:sleep_ui_kit/sleep_ui_kit.dart';
-
-// lib/components/atoms/avatar.dart
 
 class TwonDSAvatar extends StatelessWidget {
   final String? imageUrl;
   final IconData defaultIcon;
   final double radius;
-  final Color? backgroundColor;
-  final Color? iconColor;
+  final Color? customBackgroundColor;
+  final Color? customIconColor;
 
   const TwonDSAvatar({
     super.key,
     this.imageUrl,
-    this.defaultIcon = TwonDSIcons.person,
+    this.defaultIcon = Icons.person,
     this.radius = 32,
-    this.backgroundColor,
-    this.iconColor,
+    this.customBackgroundColor,
+    this.customIconColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = backgroundColor ?? TwonDSColors.accentMoon.withValues(alpha: 0.1);
-    final iColor = iconColor ?? TwonDSColors.accentMoon;
+    final colorScheme = Theme.of(context).colorScheme;
+    final bgColor = customBackgroundColor ?? colorScheme.primary.withValues(alpha: 0.1);
+    final iColor = customIconColor ?? colorScheme.primary;
 
     return Container(
       width: radius * 2,

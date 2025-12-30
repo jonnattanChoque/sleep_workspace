@@ -8,6 +8,9 @@ import 'package:sleep_sync_app/features/sleep/presentation/screens/linked_dashbo
 import 'package:sleep_sync_app/features/sleep/presentation/screens/unlinked_dashboard_screen.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
+
+final dashboardIndexProvider = StateProvider<int>((ref) => 0);
+
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
@@ -16,7 +19,6 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
-  int _selectedIndex = 0;
   final ScrollController _scrollController = ScrollController();
   
   @override
@@ -42,17 +44,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    int selectedIndex = ref.watch(dashboardIndexProvider);
     final authState = ref.watch(authControllerProvider);
     final user = authState.user;
 
     return Scaffold(
-      backgroundColor: TwonDSColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: NestedScrollView(
         controller: _scrollController,
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             SliverAppBar(
-              backgroundColor: innerBoxIsScrolled ? TwonDSColors.background : TwonDSColors.surface,
+              backgroundColor: innerBoxIsScrolled 
+                ? Theme.of(context).scaffoldBackgroundColor
+                : Theme.of(context).colorScheme.surface,
               pinned: true,
               expandedHeight: 90,
               automaticallyImplyLeading: false,
@@ -62,8 +67,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 background: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   color: innerBoxIsScrolled 
-                      ? TwonDSColors.accentMoon
-                      : TwonDSColors.background,
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).scaffoldBackgroundColor,
                 ),
                 centerTitle: false,
                 titlePadding: EdgeInsets.zero,
@@ -74,12 +79,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Text(
+                        Text(
                           AppStrings.title,
-                          style: TwonDSTextStyles.brandLogoMini,
+                          style: TwonDSTextStyles.brandLogoMini(context),
                         ),
                         const SizedBox(width: 5),
-                        const Icon(TwonDSIcons.logoHeader, size: 15, color: TwonDSColors.accentMoon),
+                        Icon(TwonDSIcons.logoHeader, size: 15, color: Theme.of(context).colorScheme.primary),
                         const Spacer(),
                         Column(
                           mainAxisSize: MainAxisSize.min,
@@ -88,7 +93,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             IconButton(
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
-                              icon: const Icon(TwonDSIcons.logout, color: Colors.white54, size: 18),
+                              icon: Icon(
+                                TwonDSIcons.logout,
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), 
+                                size: 18
+                              ),
                               onPressed: () => _showLogoutDialog(context, ref),
                             ),
                           ],
@@ -109,24 +118,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               child: child,
             );
           },
-          child: _buildCurrentTab(_selectedIndex, user),
+          child: _buildCurrentTab(selectedIndex, user, ref),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
+        currentIndex: selectedIndex,
         onTap: (index) {
-          if (index != _selectedIndex) {
+          if (index != selectedIndex) {
             setState(() {
-              _selectedIndex = index;
+              ref.read(dashboardIndexProvider.notifier).state = index;
             });
             if (_scrollController.hasClients) {
               _scrollController.jumpTo(0);
             }
           }
         },
-        backgroundColor: TwonDSColors.background,
-        selectedItemColor: TwonDSColors.accentMoon,
-        unselectedItemColor: Colors.white24,
+        
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24),
+        
         showSelectedLabels: false,
         showUnselectedLabels: false,
         type: BottomNavigationBarType.fixed,
@@ -139,12 +150,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildCurrentTab(int index, AppUser? user) {
+  Widget _buildCurrentTab(int index, AppUser? user, WidgetRef ref) {
     switch (index) {
       case 0:
         return SizedBox(
           key: const ValueKey('tab_today'),
-          child: _getTodayTabContent(user),
+          child: _getTodayTabContent(user, ref),
         );
       case 1:
         return const SizedBox(
@@ -165,7 +176,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
   }
 
-  Widget _getTodayTabContent(AppUser? user) {
+  Widget _getTodayTabContent(AppUser? user, WidgetRef ref) {
     if (user == null) {
       return const Center(
         child: CircularProgressIndicator(),

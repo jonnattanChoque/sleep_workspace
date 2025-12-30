@@ -26,6 +26,8 @@ class _TwonDSActionSliderState extends State<TwonDSActionSlider> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         double maxWidth = constraints.maxWidth;
@@ -36,14 +38,14 @@ class _TwonDSActionSliderState extends State<TwonDSActionSlider> {
           children: [
             Text(
               widget.label,
-              style: TwonDSTextStyles.bodySmall,
+              style: TwonDSTextStyles.bodySmall(context),
             ),
             const SizedBox(height: 16),
             Container(
               width: double.infinity,
               height: _size,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: colorScheme.onSurface.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(_size / 2),
               ),
               child: ClipRRect(
@@ -68,7 +70,7 @@ class _TwonDSActionSliderState extends State<TwonDSActionSlider> {
                         style: TextStyle(
                           color: _position > (maxSlide / 2) 
                               ? Colors.white 
-                              : Colors.white24,
+                              : colorScheme.onSurface.withValues(alpha: 0.24),
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                           letterSpacing: 2,

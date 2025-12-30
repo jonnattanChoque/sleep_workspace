@@ -2,32 +2,77 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
+import 'package:sleep_sync_app/core/provider/theme_provider.dart';
+import 'package:sleep_sync_app/core/services/storage_service.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_wrapper.dart';
 import 'firebase_options.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final storage = StorageService();
+  final bool? isDark = await storage.getThemeMode();
+
+  final initialTheme = isDark == null 
+      ? ThemeMode.system 
+      : (isDark ? ThemeMode.dark : ThemeMode.light);
   
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const ProviderScope(child: MyApp()));
+  
+  runApp(
+    ProviderScope(
+      overrides: [
+        themeModeProvider.overrideWith((ref) => initialTheme),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+    final isThemeLoading = ref.watch(themeLoadingProvider);
+    
     return MaterialApp(
+      key: ValueKey(themeMode), 
       title: AppStrings.title,
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        scaffoldBackgroundColor: TwonDSColors.background,
-        useMaterial3: true,
-      ),
-      home: const AuthWrapper(),
+      themeMode: themeMode,
+      theme: TwonDSTheme.light,
+      darkTheme: TwonDSTheme.dark,
+      builder: (context, child) {
+        return AnimatedTheme(
+          data: themeMode == ThemeMode.dark ? TwonDSTheme.dark : TwonDSTheme.light,
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeInOut,
+          child: child!,
+        );
+      },
+      home: Stack(
+        children: [
+          const AuthWrapper(),
+          Positioned.fill(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 400),
+              child: isThemeLoading 
+                  ? const TwnDSOverlayLoader(
+                      key: ValueKey('theme_loader'),
+                      lottiePath: 'assets/animations/loading.json',
+                      message: AppStrings.profileChangingTheme,
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          )
+        ],
+      )
     );
   }
 }

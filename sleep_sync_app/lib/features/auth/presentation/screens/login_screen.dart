@@ -67,16 +67,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 AppStrings.title,
-                style: TwonDSTextStyles.brandLogo
+                style: TwonDSTextStyles.brandLogo(context)
               ),
               const SizedBox(height: 8),
               const Icon(TwonDSIcons.sleep, size: 80, color: TwonDSColors.accentMoon),
               const SizedBox(height: 32),
               Text(
                 isLogin ? AppStrings.loginWelcome : AppStrings.registerTitle,
-                style: TwonDSTextStyles.h1,
+                style: TwonDSTextStyles.h1(context),
               ),
               const SizedBox(height: 32),
               AnimatedSwitcher(
@@ -122,11 +122,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap, 
                       ),
-                      child: const Padding(
-                        padding: EdgeInsets.only(bottom: 4),
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
                         child: Text(
                           AppStrings.forgotPassword,
-                          style: TwonDSTextStyles.labelHighlight,
+                          style: TwonDSTextStyles.labelHighlight(context),
                         ),
                       ),
                     ),
@@ -170,18 +170,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: Text.rich(
                     TextSpan(
                       text: isLogin ? AppStrings.noAccount : AppStrings.alreadyHaveAccount,
-                      style: TwonDSTextStyles.bodySmall,
+                      style: TwonDSTextStyles.bodySmall(context),
                       children: [
                         TextSpan(
                           text: isLogin ? AppStrings.registerAction : AppStrings.loginAction,
-                          style: TwonDSTextStyles.labelHighlight,
+                          style: TwonDSTextStyles.labelHighlight(context),
                         ),
                       ],
                     ),
                   ),
                 ),
               ),
-              _buildDivider(),
+              _buildDivider(context),
               _googleButton(ref, authState.isLoading),
             ],
           ),
@@ -190,39 +190,70 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final subtleColor = colorScheme.onSurface.withValues(alpha: isDark ? 0.24 : 0.15);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Row(
         children: [
-          const Expanded(child: Divider(color: Colors.white24, thickness: 1)),
+          Expanded(
+            child: Divider(
+              color: subtleColor, 
+              thickness: 1
+            )
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text("o", style: TextStyle(color: Colors.white.withValues(alpha: 0.5))),
+            child: Text(
+              "o", 
+              style: TextStyle(
+                color: colorScheme.onSurface.withValues(alpha: 0.5),
+                fontWeight: FontWeight.w500,
+              )
+            ),
           ),
-          const Expanded(child: Divider(color: Colors.white24, thickness: 1)),
+          Expanded(
+            child: Divider(
+              color: subtleColor, 
+              thickness: 1
+            )
+          ),
         ],
       ),
     );
   }
 
   Widget _googleButton(WidgetRef ref, bool isLoading) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return OutlinedButton.icon(
       onPressed: isLoading 
           ? null 
           : () => ref.read(authControllerProvider.notifier).loginWithGoogle(),
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(double.infinity, 50),
-        side: const BorderSide(color: Colors.white24),
+        side: BorderSide(
+          color: isDark 
+              ? Colors.white24 
+              : colorScheme.onSurface.withValues(alpha: 0.12),
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: isDark ? Colors.transparent : colorScheme.surface,
       ),
       icon: Image.network(
         TwonDSAssets.googleLogoUrl,
         height: 20,
       ),
-      label: const Text(
+      label: Text(
         AppStrings.googleContinue,
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+        style: TextStyle(
+          color: colorScheme.onSurface, 
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
