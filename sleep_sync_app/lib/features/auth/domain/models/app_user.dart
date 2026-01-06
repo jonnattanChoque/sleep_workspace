@@ -3,6 +3,7 @@ class AppUser {
   final String email;
   final String? name;
   final String? partnerId;
+  final String? partnerName;
   final String? pairingCode;
   final bool? verifiedEmail;
 
@@ -11,18 +12,8 @@ class AppUser {
     required this.email,
     this.name,
     this.partnerId,
+    this.partnerName,
     this.pairingCode,
     this.verifiedEmail,
   });
-
-  factory AppUser.fromMap(Map<String, dynamic> map, String id) {
-    return AppUser(
-      uid: id,
-      email: map['email'] ?? '',
-      name: map['name'] ?? '',
-      partnerId: map['partnerId'],
-      pairingCode: map['pairingCode'],
-      verifiedEmail: map['verifiedEmail'],
-    );
-  }
 }

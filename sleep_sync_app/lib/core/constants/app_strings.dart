@@ -56,6 +56,7 @@ class AppStrings {
   static const linkPartnerSubtitle = "Ingresa el código que aparece en el dispositivo de tu pareja para comenzar.";
   static const enterLinkCodeHint = 'Ingresa el código de vínculación';
   static const linkAction = 'Vincular';
+  static const noLinkend = "Sin vinculación";
   static const errorInvalidLinkCode = 'El código ingresado no existe. Verifica y vuelve a intentarlo.';
   static const errorLinkedWithSelf = 'No puedes vincularte con tu propio código.';
   static const errorPartnerAlreadyLinked = 'Esta persona ya está vinculada con alguien más.';
@@ -77,4 +78,8 @@ class AppStrings {
   static const profileSliderUnlink = 'Desliza para desvincular';
   static const profileSliderPlaceholder = 'Desvincular';
   static const profileChangingTheme = "Sincronizando tu modo...";
+  // Edit profile
+  static const editProfileSubtitle = "¿Cómo quieres que te llamemos?";
+  static const nameTextield = "Ingresa tu nombre";
+  static const editProfileButton = "Editar";
 }

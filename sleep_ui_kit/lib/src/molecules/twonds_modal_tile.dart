@@ -5,6 +5,7 @@ class TwonDSModalTile extends StatelessWidget {
   final String title;
   final String? trailing;
   final Color? color;
+  final IconData? iconTab;
   final VoidCallback onTap;
 
   const TwonDSModalTile({
@@ -13,6 +14,7 @@ class TwonDSModalTile extends StatelessWidget {
     required this.title,
     this.trailing,
     this.color,
+    this.iconTab,
     required this.onTap,
   });
 
@@ -49,7 +51,7 @@ class TwonDSModalTile extends StatelessWidget {
             ),
           const SizedBox(width: 8),
           Icon(
-            Icons.chevron_right, 
+            iconTab ?? Icons.chevron_right, 
             size: 18, 
             color: colorScheme.onSurface.withValues(alpha: 0.24)
           ),

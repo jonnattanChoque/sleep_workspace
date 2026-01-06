@@ -5,6 +5,7 @@ class TwonDSTheme {
   static ThemeData get dark {
     return ThemeData(
       brightness: Brightness.dark,
+      dividerColor: TwonDSColors.accentMoon.withValues(alpha: 0.3),
       scaffoldBackgroundColor: TwonDSColors.background,
       colorScheme: const ColorScheme.dark(
         primary: TwonDSColors.accentMoon,
@@ -18,6 +19,7 @@ class TwonDSTheme {
   static ThemeData get light {
     return ThemeData(
       brightness: Brightness.light,
+      dividerColor: TwonDSColors.primaryNight.withValues(alpha: 0.3),
       scaffoldBackgroundColor: Color(0xFFF8FAFC),
       colorScheme: const ColorScheme.light(
         primary: TwonDSColors.primaryNight,

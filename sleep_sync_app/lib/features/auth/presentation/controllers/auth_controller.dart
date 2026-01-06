@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
@@ -48,13 +50,25 @@ class AuthState {
 
 class AuthController extends StateNotifier<AuthState> {
   final IAuthRepository _authRepository;
+  StreamSubscription<AppUser?>? _userSubscription;
 
   AuthController(this._authRepository) : super(AuthState.initial()) {
-    _initialSync();
+    _listenToUserChanges();();
   }
 
-  Future<void> _initialSync() async {
-    await syncUserStatus();
+  void _listenToUserChanges() {
+    _userSubscription?.cancel();
+    _userSubscription = _authRepository.onAuthStateChanged.listen((user) {
+      if (mounted) {
+        state = state.copyWith(user: user);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _userSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> syncUserStatus({bool force = false}) async {

@@ -42,6 +42,7 @@ class _UnlinkedDashboardContentState extends ConsumerState<_UnlinkedDashboardCon
       inputField: TwonDSTextField(
         hint: AppStrings.enterLinkCodeHint, 
         icon: TwonDSIcons.link, 
+        onFocus: true,
         controller: codeController
       ),
       actionButton: TwonDSElevatedButton(

@@ -20,7 +20,7 @@ class TwonDSBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: moonColor.withValues(alpha: 0.7),
+        color: customColor ?? moonColor.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: moonColor.withValues(alpha: .6),

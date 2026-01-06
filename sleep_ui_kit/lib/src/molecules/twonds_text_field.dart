@@ -5,6 +5,7 @@ class TwonDSTextField extends StatefulWidget {
   final IconData icon;
   final TextEditingController controller;
   final bool isPassword;
+  final bool onFocus;
 
   const TwonDSTextField({
     super.key,
@@ -12,6 +13,7 @@ class TwonDSTextField extends StatefulWidget {
     required this.icon,
     required this.controller,
     this.isPassword = false,
+    this.onFocus = false
   });
 
   @override
@@ -28,6 +30,7 @@ class _TwonTextFieldState extends State<TwonDSTextField> {
     return TextField(
       controller: widget.controller,
       obscureText: widget.isPassword ? _obscureText : false,
+      autofocus: widget.onFocus,
       style: TextStyle(color: colorScheme.onSurface),
       decoration: InputDecoration(
         filled: true,
