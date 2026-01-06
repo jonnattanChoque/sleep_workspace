@@ -3,7 +3,7 @@ import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
 class TwonDSElevatedButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final Function()? onPressed;
   final bool isLoading;
 
   const TwonDSElevatedButton({
@@ -27,12 +27,20 @@ class TwonDSElevatedButton extends StatelessWidget {
           foregroundColor: colorScheme.onPrimary,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           elevation: 0,
-          disabledBackgroundColor: colorScheme.onSurface.withValues(alpha: 0.12),
+          disabledBackgroundColor: isLoading 
+              ? colorScheme.primary.withValues(alpha: 0.6) 
+              : colorScheme.onSurface.withValues(alpha: 0.12),
         ),
         child: isLoading 
-          ? CircularProgressIndicator(
-              color: colorScheme.onPrimary, 
-              strokeWidth: 3,
+          ? SizedBox(
+              height: 24,
+              width: 24,
+              child: CircularProgressIndicator(
+                color: Theme.of(context).brightness == Brightness.dark 
+                    ? colorScheme.onPrimary 
+                    : Colors.white, 
+                strokeWidth: 3,
+              ),
             )
           : Text(
               text,

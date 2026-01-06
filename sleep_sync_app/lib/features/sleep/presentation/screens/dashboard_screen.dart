@@ -48,6 +48,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final authState = ref.watch(authControllerProvider);
     final user = authState.user;
 
+    if (user == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: NestedScrollView(
@@ -150,7 +156,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildCurrentTab(int index, AppUser? user, WidgetRef ref) {
+  Widget _buildCurrentTab(int index, AppUser user, WidgetRef ref) {
     switch (index) {
       case 0:
         return SizedBox(
@@ -168,21 +174,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
         );
       case 2:
-        return const ProfileScreen(
-          key: ValueKey('tab_profile'),
+        return ProfileScreen(
+          key: const ValueKey('tab_profile'),
+          user: user,
         );
       default:
         return const SizedBox.shrink();
     }
   }
 
-  Widget _getTodayTabContent(AppUser? user, WidgetRef ref) {
-    if (user == null) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-    
+  Widget _getTodayTabContent(AppUser user, WidgetRef ref) {
     final hasPartner = user.partnerId != null && user.partnerId!.trim().isNotEmpty;
 
     return RefreshIndicator(
