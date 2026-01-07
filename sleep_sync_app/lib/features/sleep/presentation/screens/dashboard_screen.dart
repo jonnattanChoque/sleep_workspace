@@ -188,7 +188,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
     return RefreshIndicator(
       onRefresh: () async {
-        await ref.read(authControllerProvider.notifier).syncUserStatus(force: true);
+        await Future.delayed(const Duration(seconds: 1));
       },
       color: TwonDSColors.accentMoon,
       child: CustomScrollView(

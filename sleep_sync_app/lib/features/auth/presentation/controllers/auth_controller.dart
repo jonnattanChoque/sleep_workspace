@@ -54,7 +54,6 @@ class AuthController extends StateNotifier<AuthState> {
 
   AuthController(this._authRepository) : super(AuthState.initial()) {
     _listenToUserChanges();
-    syncUserStatus();
   }
 
   void _listenToUserChanges() {
@@ -70,16 +69,6 @@ class AuthController extends StateNotifier<AuthState> {
   void dispose() {
     _userSubscription?.cancel();
     super.dispose();
-  }
-
-  Future<void> syncUserStatus({bool force = false}) async {
-    if (!force && state.user?.partnerId != null) {
-      return;
-    }
-    final appUser = await _authRepository.getAuthenticatedUserData();
-    if (appUser != null) {
-      state = state.copyWith(user: appUser);
-    }
   }
 
   Future<void> signUp(String email, String password, String name) async {

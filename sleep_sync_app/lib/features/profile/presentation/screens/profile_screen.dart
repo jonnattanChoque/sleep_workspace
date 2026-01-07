@@ -1,5 +1,6 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 // ignore_for_file: use_build_context_synchronously
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
@@ -161,6 +162,48 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
   
+  void _showSleepGoalPicker(BuildContext context, WidgetRef ref, double currentGoal) {
+    final List<double> options = List.generate(17, (index) => 4.0 + (index * 0.5));
+    int initialItem = options.indexOf(currentGoal);
+    if (initialItem == -1) initialItem = 8;
+    double selectedGoal = currentGoal;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return TwonDSModalLayout(
+            title: AppStrings.sleepGoalTitle,
+            children: [
+              SizedBox(
+                height: 200,
+                child: CupertinoPicker(
+                  scrollController: FixedExtentScrollController(initialItem: initialItem),
+                  itemExtent: 40,
+                  onSelectedItemChanged: (index) {
+                    selectedGoal = options[index];
+                  },
+                  children: options.map((h) => Center(
+                    child: Text("$h${AppStrings.hours}", style: TwonDSTextStyles.bodyMedium(context)),
+                  )).toList(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              TwonDSElevatedButton(
+                text: AppStrings.buttonConfirm,
+                onPressed: () {
+                  ref.read(profileControllerProvider.notifier).updateSleepGoal(selectedGoal);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+  
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
@@ -198,7 +241,7 @@ class ProfileScreen extends ConsumerWidget {
         children: [
           _buildIdentityCard(user),
           const SizedBox(height: 30),
-          _buildMetricsGrid(),
+          _buildMetricsGrid(context, ref),
           const SizedBox(height: 20),
           _buildActionItem(
             Icons.security_outlined, 
@@ -233,28 +276,32 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMetricsGrid() {
+  Widget _buildMetricsGrid(BuildContext context, WidgetRef ref) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
         flex: 3,
         child: TwonDSStatCard(
-          title: AppStrings.profileAverageSleep,
-          value: "8h 30m",
-          valueColor: const Color(0xFF3F51B5),
+          title: "Tu Meta",
+          value: "${user.sleepGoal}h",
+          valueColor: TwonDSColors.secondText,
           height: 160,
+          centerIcon: Icons.alarm_on_rounded,
           iconTap: TwonDSIcons.edit,
-          onTap: () {},
+          onTap: () => _showSleepGoalPicker(context, ref, user.sleepGoal ?? 0)
         ),
       ),
       const SizedBox(width: 16),
       Expanded(
-        flex: 2,
+        flex: 3,
         child: TwonDSStatCard(
           title: AppStrings.profileAverageSleep,
           value: "7.5h",
-          height: 120,
+          valueColor: const Color(0xFF3F51B5),
+          iconTap: TwonDSIcons.eye,
+          centerIcon: TwonDSIcons.linked,
+          height: 140,
           onTap: () {},
         ),
       ),

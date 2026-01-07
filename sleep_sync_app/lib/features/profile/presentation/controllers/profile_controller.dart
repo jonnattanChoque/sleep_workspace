@@ -90,6 +90,30 @@ class ProfileController extends StateNotifier<AsyncValue<ProfileActionState>> {
     }
   }
 
+  Future<void> updateSleepGoal(double hours) async {
+    state = const AsyncLoading();
+
+    try {
+      final ProfileFailure result = await _repository.updateSleepGoal(hours);
+      if (result == ProfileFailure.none) {
+        state = const AsyncData(ProfileActionState(
+          message: AppStrings.sleepGoalChanged,
+          isError: false,
+        ));
+      } else {
+        state = AsyncData(ProfileActionState(
+          message: _mapFailureToMessage(result), 
+          isError: true,
+        ));
+      }
+    } catch (e) {
+      state = const AsyncData(ProfileActionState(
+        message: AppStrings.errorGeneral, 
+        isError: true,
+      ));
+    }
+  }
+
   String _mapFailureToMessage(ProfileFailure failure) {
     switch (failure) {
       case ProfileFailure.serverError:

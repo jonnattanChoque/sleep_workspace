@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
 import 'package:sleep_sync_app/core/provider/loader_provider.dart';
 import 'package:sleep_sync_app/core/utils/code_generator.dart';
-import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
 import 'package:sleep_sync_app/features/linking/data/repository/firebase_linking_repository.dart';
 import 'package:sleep_sync_app/features/linking/domain/enum/linking_failure.dart';
 import 'package:sleep_sync_app/features/linking/domain/repository/i_linking_repository.dart';
@@ -53,8 +52,6 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
     
     if (result == LinkingFailure.none) {
       try {
-        final auth = ref.read(authControllerProvider.notifier);
-        await auth.syncUserStatus(force: true);
         state = const AsyncData(AppStrings.linkSuccess);
       } catch (e) {
         state = AsyncError(e.toString(), StackTrace.current);
