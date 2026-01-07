@@ -53,7 +53,8 @@ class AuthController extends StateNotifier<AuthState> {
   StreamSubscription<AppUser?>? _userSubscription;
 
   AuthController(this._authRepository) : super(AuthState.initial()) {
-    _listenToUserChanges();();
+    _listenToUserChanges();
+    syncUserStatus();
   }
 
   void _listenToUserChanges() {

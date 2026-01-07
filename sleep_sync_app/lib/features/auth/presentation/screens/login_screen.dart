@@ -27,21 +27,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  void _showTwonSnackBar(BuildContext context, String message, Color backgroundColor) {
+  void _showTwonSnackBar(BuildContext context, String message, bool isError) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
-        ),
-        backgroundColor: backgroundColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    TwnDSMessage.show(context, message.toString(), isError: isError);
   }
 
   @override
@@ -49,11 +38,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ref.listen<AuthState>(authControllerProvider, (previous, next) {
       if (next.timestamp != previous?.timestamp) {
         if (next.error != null) {
-          _showTwonSnackBar(context, next.error!, next.background);
+          _showTwonSnackBar(context, next.error!, true);
         }
         
         if (next.successMessage != null) {
-          _showTwonSnackBar(context, next.successMessage!, next.background);
+          _showTwonSnackBar(context, next.successMessage!, false);
         }
       }
     });

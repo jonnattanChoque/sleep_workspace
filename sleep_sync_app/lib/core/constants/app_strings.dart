@@ -1,6 +1,8 @@
 class AppStrings {
   // Auth Headers
   static const title = "SleepSync";
+  static const changeTheme = "Cambiando tu tema...";
+
 
   // Form Fields
   static const emailLabel = "Correo electrónico";
@@ -11,7 +13,7 @@ class AppStrings {
   static const errorInvalidEmail = "El formato del correo electrónico no es válido.";
   static const invalidCredential = "Las credenciales proporcionadas no son válidas.";
   static const errorShortPassword = "La contraseña debe tener al menos 6 caracteres.";
-  static const errorUserNotFound = "No encontramos una cuenta con ese correo.";
+  static const errorUserNotFound = "No encontramos una cuenta activa.";
   static const errorWrongPassword = "La contraseña es incorrecta.";
   static const errorEmailNotVerified = "Por favor, verifica tu correo electrónico antes de iniciar sesión.";
   static const errorEmailAlreadyInUse = "El correo electrónico ya está en uso. Intenta con otro.";
@@ -57,6 +59,8 @@ class AppStrings {
   static const enterLinkCodeHint = 'Ingresa el código de vínculación';
   static const linkAction = 'Vincular';
   static const noLinkend = "Sin vinculación";
+  static const linkProcess = "Vinculando con tu pareja...";
+  static const linkSuccess = "Pareja vinculada";
   static const errorInvalidLinkCode = 'El código ingresado no existe. Verifica y vuelve a intentarlo.';
   static const errorLinkedWithSelf = 'No puedes vincularte con tu propio código.';
   static const errorPartnerAlreadyLinked = 'Esta persona ya está vinculada con alguien más.';
@@ -82,4 +86,11 @@ class AppStrings {
   static const editProfileSubtitle = "¿Cómo quieres que te llamemos?";
   static const nameTextield = "Ingresa tu nombre";
   static const editProfileButton = "Editar";
+  static const nameUpdated = "Nombre actualizado";
+  // Unlink
+  static const unlinkedSuccess = "Vinculación eliminada con éxito";
+  static const unlinkProcess = "Desvinculando pareja...";
+  // Push
+  static const pushOn = "Notificaciones activas";
+  static const pushOff = "Notificaciones inactivas";
 }

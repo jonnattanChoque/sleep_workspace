@@ -63,23 +63,11 @@ class _UnlinkedDashboardContentState extends ConsumerState<_UnlinkedDashboardCon
   Widget build(BuildContext context) {
     final linkingState = ref.watch(linkingControllerProvider);
     final code = linkingState.valueOrNull;
-    final isLoading = linkingState.isLoading;
 
     ref.listen<AsyncValue>(linkingControllerProvider, (previous, next) {
         if (next is AsyncError && previous is! AsyncError) {
           final errorMessage = next.error.toString();
-          
-          ScaffoldMessenger.of(context).clearSnackBars();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(errorMessage), 
-              backgroundColor: TwonDSColors.error,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              duration: const Duration(seconds: 2),
-              margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
-            ),
-          );
+          TwnDSMessage.show(context, errorMessage.toString(), isError: true);
         }
         if (previous is AsyncLoading && next is AsyncData) {
           if (Navigator.canPop(context)) {
@@ -130,26 +118,10 @@ class _UnlinkedDashboardContentState extends ConsumerState<_UnlinkedDashboardCon
                 style: TwonDSTextStyles.labelHighlight(context)
               ),
               const SizedBox(height: 20),
-              if (isLoading)
-                Column(
-                  children: [
-                    CircularProgressIndicator(
-                      color: Theme.of(context).colorScheme.primary
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      AppStrings.creatingCode,
-                      style: TwonDSTextStyles.bodySmall(context).copyWith(
-                        color: Theme.of(context).colorScheme.primary
-                      ),
-                    ),
-                  ],
-                )
-              else
-                Text(
-                  code ?? '---',
-                  style: TwonDSTextStyles.displayCode(context),
-                ),
+              Text(
+                code ?? '---',
+                style: TwonDSTextStyles.displayCode(context),
+              ),
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
