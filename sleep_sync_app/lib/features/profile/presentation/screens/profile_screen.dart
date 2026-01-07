@@ -1,128 +1,196 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
+// ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
 import 'package:sleep_sync_app/core/provider/theme_provider.dart';
 import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
+import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
+import 'package:sleep_sync_app/features/linking/presentation/linking_provider.dart';
+import 'package:sleep_sync_app/features/profile/domain/enum/profile_failure.dart';
 import 'package:sleep_sync_app/features/profile/presentation/profile_provider.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
 class ProfileScreen extends ConsumerWidget {
   final AppUser user;
   const ProfileScreen({super.key, required this.user});
-  
 
+  void _openSettings(BuildContext context, WidgetRef ref, AppUser user) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Consumer( 
+        builder: (context, ref, child) {
+            return TwonDSModalLayout(
+              title: AppStrings.profileConfiguration,
+              children: [
+                TwonDSModalTile(
+                  icon: Icons.person_outline,
+                  title: AppStrings.profileEditProfile,
+                  iconTab: TwonDSIcons.edit,
+                  onTap: () async {
+                    Navigator.pop(context);
+                    
+                    final TextEditingController nameController = TextEditingController(text: user.name);
+                    TwnDSInputDialogModal.show(
+                      context: context, 
+                      title: AppStrings.profileEditProfile, 
+                      description: AppStrings.editProfileSubtitle, 
+                      inputField: TwonDSTextField(
+                        onFocus: true,
+                        hint: AppStrings.nameTextield, 
+                        icon: TwonDSIcons.profile, 
+                        controller: nameController
+                      ),
+                      actionButton: Consumer(
+                        builder: (context, ref, child) {
+                          final profileState = ref.watch(profileControllerProvider);
+                          final bool isLoading = profileState.isLoading;
+                          
+                          return PopScope(
+                            canPop: !isLoading,
+                            child: TwonDSElevatedButton(
+                              text: AppStrings.editProfileButton,
+                              isLoading: isLoading, 
+                              onPressed: isLoading 
+                                ? null
+                                : () async {
+                                    final newName = nameController.text.trim();
+                                    final success = await ref.read(profileControllerProvider.notifier).updateName(newName);
+                                    if (!context.mounted) return;
+                            
+                                    if (success && context.mounted) {
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }
+                ),
+                TwonDSSwitchTile(
+                  icon: Icons.notifications_none,
+                  title: AppStrings.profilePush,
+                  value: ref.watch(notificationsSwitchProvider),
+                  onChanged: (bool isOn) async {
+                    ref.read(notificationsSwitchProvider.notifier).state = isOn;
+                    await ref.read(profileControllerProvider.notifier).togglePush(isOn);
+                    if (!context.mounted) return;
+
+                    await Future.delayed(const Duration(milliseconds: 500));
+                    Navigator.pop(context);
+                  },
+                ),
+                TwonDSSwitchTile(
+                  icon: Icons.dark_mode_outlined,
+                  title: AppStrings.profileTheme,
+                  value: ref.watch(themeModeProvider) == ThemeMode.dark,
+                  onChanged: (bool isDarkMode) async {
+                    final themeLoading = ref.read(themeLoadingProvider.notifier);
+                    final themeMode = ref.read(themeModeProvider.notifier);
+                    final storage = ref.read(storageServiceProvider);
+                    
+                    if (!context.mounted) return;
+                    Navigator.pop(context);
+                    await Future.delayed(const Duration(milliseconds: 250));
+
+                    themeLoading.state = true;
+                    await Future.delayed(const Duration(milliseconds: 800));
+
+                    themeMode.state = isDarkMode ? ThemeMode.dark : ThemeMode.light;
+                    await storage.setThemeMode(isDarkMode);
+                    await Future.delayed(const Duration(milliseconds: 1200));
+                    
+                    themeLoading.state = false;
+                  },
+                ),
+                Divider(color: Theme.of(context).dividerColor),
+                TwonDSModalTile(
+                  icon: Icons.logout,
+                  title: AppStrings.profileLogout,
+                  color: Colors.redAccent,
+                  onTap: () => _showLogoutDialog(context, ref),
+                ),
+              ],
+            );
+        }
+      )
+    );
+  }
+  
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => TwnDSConfirmDialog(
+        title: AppStrings.confirmTitle,
+        description: AppStrings.confirmMessage,
+        confirmText: AppStrings.confirmAction,
+        onConfirm: () async {
+          await ref.read(authControllerProvider.notifier).signOut();
+          if (context.mounted) Navigator.pop(context);
+        },
+      ),
+    );
+  }
+  
+  void _showLinkModal(BuildContext context, WidgetRef ref) {
+    final TextEditingController codeController = TextEditingController();
+    TwnDSInputDialogModal.show(
+      context: context,
+      title: AppStrings.linkPartnerTitle,
+      description: AppStrings.linkPartnerSubtitle,
+      inputField: TwonDSTextField(
+        hint: AppStrings.enterLinkCodeHint, 
+        icon: TwonDSIcons.link, 
+        onFocus: true,
+        controller: codeController
+      ),
+      actionButton: TwonDSElevatedButton(
+        text: AppStrings.linkAction,
+        onPressed: () async {
+          final code = codeController.text.trim();
+          
+          if (code.isNotEmpty) {
+            Navigator.pop(context);
+            await ref.read(linkingControllerProvider.notifier).linkWithPartner(code);
+          }
+        },
+      ),
+    );
+  }
+  
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
-    ref.listen<AsyncValue>(profileControllerProvider, (previous, next) {
-      next.whenOrNull(
-        error: (error, _) {
-          TwnDSMessage.show(context, error.toString(), isError: true);
-        },
-        data: (_) {
-          if (previous is AsyncLoading) {
-            TwnDSMessage.show(context, "Nombre actualizado", isError: false);
-          }
-        },
-      );
+    ref.listen<AsyncValue>(linkingControllerProvider, (previous, next) {
+      if (previous is AsyncLoading && !next.isLoading) {
+        final actionState = next.value;
+        if (actionState!.message.isNotEmpty) {
+          TwnDSMessage.show(
+            context, 
+            actionState.message, 
+            isError: actionState.isError,
+          );
+        }
+      }
     });
 
-    void _openSettings(BuildContext context, WidgetRef ref, AppUser user) {
-      showModalBottomSheet(
-        context: context,
-        backgroundColor: Colors.transparent,
+    ref.listen<AsyncValue<ProfileActionState>>(profileControllerProvider, (previous, next) {
+      if (previous is AsyncLoading && next is AsyncData) {
+        final actionState = next.value;
+        
+        if (actionState!.message.isNotEmpty) {
+          TwnDSMessage.show(
+            context, 
+            actionState.message, 
+            isError: actionState.isError,
+          );
+        }
+      }
+    });
 
-        builder: (context) => TwonDSModalLayout(
-          title: AppStrings.profileConfiguration,
-          children: [
-            TwonDSModalTile(
-              icon: Icons.person_outline,
-              title: AppStrings.profileEditProfile,
-              iconTab: TwonDSIcons.edit,
-              onTap: () async {
-                Navigator.pop(context);
-                
-                final TextEditingController nameController = TextEditingController(text: user.name);
-                TwnDSInputDialogModal.show(
-                  context: context, 
-                  title: AppStrings.profileEditProfile, 
-                  description: AppStrings.editProfileSubtitle, 
-                  inputField: TwonDSTextField(
-                    onFocus: true,
-                    hint: AppStrings.nameTextield, 
-                    icon: TwonDSIcons.profile, 
-                    controller: nameController
-                  ),
-                  actionButton: Consumer(
-                    builder: (context, ref, child) {
-                      final profileState = ref.watch(profileControllerProvider);
-                      final bool isLoading = profileState.isLoading;
-                      
-                      return PopScope(
-                        canPop: !isLoading,
-                        child: TwonDSElevatedButton(
-                          text: AppStrings.editProfileButton,
-                          isLoading: isLoading, 
-                          onPressed: isLoading 
-                            ? null
-                            : () async {
-                                final newName = nameController.text.trim();
-                                final success = await ref.read(profileControllerProvider.notifier).updateName(newName);
-                                if (!context.mounted) return;
-                        
-                                if (success && context.mounted) {
-                                  Navigator.pop(context);
-                                }
-                              },
-                        ),
-                      );
-                    },
-                  ),
-                );
-              }
-            ),
-            TwonDSSwitchTile(
-              icon: Icons.notifications_none,
-              title: AppStrings.profilePush,
-              value: true,
-              onChanged: (val) {},
-            ),
-            TwonDSSwitchTile(
-              icon: Icons.dark_mode_outlined,
-              title: AppStrings.profileTheme,
-              value: ref.watch(themeModeProvider) == ThemeMode.dark,
-              onChanged: (bool isDarkMode) async {
-                final themeLoading = ref.read(themeLoadingProvider.notifier);
-                final themeMode = ref.read(themeModeProvider.notifier);
-                final storage = ref.read(storageServiceProvider);
-                
-                if (!context.mounted) return;
-                Navigator.pop(context);
-                await Future.delayed(const Duration(milliseconds: 250));
-
-                themeLoading.state = true;
-                await Future.delayed(const Duration(milliseconds: 800));
-
-                themeMode.state = isDarkMode ? ThemeMode.dark : ThemeMode.light;
-                await storage.setThemeMode(isDarkMode);
-                await Future.delayed(const Duration(milliseconds: 1200));
-                
-                themeLoading.state = false;
-              },
-            ),
-            Divider(color: Theme.of(context).dividerColor),
-            TwonDSModalTile(
-              icon: Icons.logout,
-              title: AppStrings.profileLogout,
-              color: Colors.redAccent,
-              onTap: () {},
-            ),
-          ],
-        ),
-      );
-    }
-    
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -140,11 +208,7 @@ class ProfileScreen extends ConsumerWidget {
             }
           ),
           const SizedBox(height: 50),
-          TwonDSActionSlider(
-            label: AppStrings.profileSliderUnlink,
-            placeholder: AppStrings.profileSliderPlaceholder,
-            onAction: () {},
-          ),
+          _showlinkedButton(context, ref, user),
           const SizedBox(height: 50),
         ],
       ),
@@ -206,4 +270,25 @@ class ProfileScreen extends ConsumerWidget {
       iconTap: TwonDSIcons.edit,
     );
   }
+
+  Widget _showlinkedButton(BuildContext context, WidgetRef ref, AppUser user) {
+    final isLinked = user.partnerName.toString().isNotEmpty && user.partnerName != null;
+
+    if (isLinked) {
+      return TwonDSActionSlider(
+        label: AppStrings.profileSliderUnlink,
+        placeholder: AppStrings.profileSliderPlaceholder,
+        onAction: () {
+          ref.read(profileControllerProvider.notifier).unlink();
+        },
+      );
+    } else {
+      return TwonDSElevatedButton(
+        text: AppStrings.linkPartnerTitle,
+        onPressed: () => _showLinkModal(context, ref),
+      );
+    }
+  }
 }
+
+final notificationsSwitchProvider = StateProvider<bool>((ref) => false);

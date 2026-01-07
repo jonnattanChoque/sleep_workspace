@@ -12,7 +12,7 @@ class _LinkedDashboardScreenState extends State<LinkedDashboardScreen> {
   Widget build(BuildContext context) {
     return Container(
       child: const Center(
-        child: Text('Linked Dashboard Screen', style: TextStyle(color: Colors.white),),
+        child: Text('Linked Dashboard Screen', style: TextStyle(color: Colors.black),),
       ),
     );
   }

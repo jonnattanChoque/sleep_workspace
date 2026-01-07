@@ -23,7 +23,7 @@ class TwonDSBadge extends StatelessWidget {
         color: customColor ?? moonColor.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: moonColor.withValues(alpha: .6),
+          color: customColor ?? moonColor.withValues(alpha: .6),
           width: 1,
         ),
       ),

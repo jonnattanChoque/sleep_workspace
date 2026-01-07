@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
+import 'package:sleep_sync_app/core/provider/loader_provider.dart';
 import 'package:sleep_sync_app/core/provider/theme_provider.dart';
 import 'package:sleep_sync_app/core/services/storage_service.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_wrapper.dart';
@@ -38,6 +39,7 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final loaderState = ref.watch(loaderProvider);
     final themeMode = ref.watch(themeModeProvider);
     final isThemeLoading = ref.watch(themeLoadingProvider);
     
@@ -62,11 +64,11 @@ class MyApp extends ConsumerWidget {
           Positioned.fill(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 400),
-              child: isThemeLoading 
-                  ? const TwnDSOverlayLoader(
-                      key: ValueKey('theme_loader'),
+              child: isThemeLoading || loaderState.isLoading
+                  ? TwnDSOverlayLoader(
+                      key: const ValueKey('theme_loader'),
                       lottiePath: 'assets/animations/loading.json',
-                      message: AppStrings.profileChangingTheme,
+                      message: loaderState.message ?? AppStrings.changeTheme,
                     )
                   : const SizedBox.shrink(),
             ),

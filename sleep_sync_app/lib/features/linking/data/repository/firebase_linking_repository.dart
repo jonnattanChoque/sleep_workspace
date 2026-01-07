@@ -39,7 +39,7 @@ class FirebaseLinkingRepository implements ILinkingRepository {
       if (!codeDoc.exists) return (LinkingFailure.invalidCode);
 
       final String? partnerUid = codeDoc.data()?['userId'];
-      final bool isAvailable = codeDoc.data()?['isAvailable'] ?? false; 
+      final bool isAvailable = codeDoc.data()?['isAvailable'] ?? true; 
       if (!isAvailable) return LinkingFailure.partnerAlreadyLinked;
       if (partnerUid == null) return (LinkingFailure.invalidCode);
       if (partnerUid == myUid) return (LinkingFailure.selfLinking);

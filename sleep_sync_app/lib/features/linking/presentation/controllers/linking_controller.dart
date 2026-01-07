@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
+import 'package:sleep_sync_app/core/provider/loader_provider.dart';
 import 'package:sleep_sync_app/core/utils/code_generator.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
 import 'package:sleep_sync_app/features/linking/data/repository/firebase_linking_repository.dart';
@@ -34,6 +35,11 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
   }
 
   Future<void> linkWithPartner(String partnerCode) async {
+    ref.read(loaderProvider.notifier).state = const LoaderState(
+      isLoading: true, 
+      message: AppStrings.linkProcess
+    );
+
     final currentCode = state.value;
     state = const AsyncLoading<String?>().copyWithPrevious(state);
 
@@ -42,20 +48,28 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
 
     final result = await _repository.linkWithPartner(
       myUid: myUid,
-      partnerCode: partnerCode,
+      partnerCode: partnerCode.toUpperCase(),
     );
     
     if (result == LinkingFailure.none) {
       try {
         final auth = ref.read(authControllerProvider.notifier);
         await auth.syncUserStatus(force: true);
-        state = const AsyncData(null);
+        state = const AsyncData(AppStrings.linkSuccess);
       } catch (e) {
         state = AsyncError(e.toString(), StackTrace.current);
+      } finally {
+        await Future.delayed(const Duration(milliseconds: 1000));
+        ref.read(loaderProvider.notifier).state = const LoaderState(isLoading: false);
+        await Future.delayed(const Duration(milliseconds: 450));
       }
     } else {
+      await Future.delayed(const Duration(milliseconds: 1000));
+      ref.read(loaderProvider.notifier).state = const LoaderState(isLoading: false);
+      await Future.delayed(const Duration(milliseconds: 450));
+
       final errorMessage = _mapFailureToMessage(result);
-      state = AsyncError<String?>(errorMessage, StackTrace.current)
+      state = AsyncError<String?>(errorMessage, StackTrace. current)
         .copyWithPrevious(AsyncData(currentCode));
     }
   }
