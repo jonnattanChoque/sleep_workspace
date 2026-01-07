@@ -7,6 +7,7 @@ class TwonDSStatCard extends StatelessWidget {
   final Color? valueColor;
   final double height;
   final IconData? iconTap;
+  final IconData? centerIcon;
   final VoidCallback onTap;
 
   const TwonDSStatCard({
@@ -15,6 +16,7 @@ class TwonDSStatCard extends StatelessWidget {
     required this.value,
     required this.onTap,
     this.iconTap,
+    this.centerIcon,
     this.height = 140,
     this.valueColor, 
   });
@@ -65,13 +67,21 @@ class TwonDSStatCard extends StatelessWidget {
                     ),
                     Icon(
                       iconTap ?? Icons.arrow_forward_ios,
-                      size: 15,
+                      size: 17,
                       color: isDark 
                           ? colorScheme.onSurface.withValues(alpha: 0.7)
                           : colorScheme.onSurface.withValues(alpha: 0.4),
                     ),
                   ]
                 ),
+                if (centerIcon != null) ...[
+                  const Spacer(),
+                  Icon(
+                    centerIcon,
+                    size: 40,
+                    color: (valueColor ?? accentColor).withAlpha(180),
+                  ),
+                ],
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.bottomLeft,

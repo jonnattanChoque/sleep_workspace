@@ -22,4 +22,6 @@ class TwonDSIcons {
   static const IconData email = Icons.email;
   static const IconData lock = Icons.lock;
   static const IconData edit = Icons.edit_rounded;
+  static const IconData eye = Icons.remove_red_eye_sharp;
+  static const IconData linked = Icons.link;
 }

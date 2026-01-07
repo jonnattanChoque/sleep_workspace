@@ -17,61 +17,33 @@ class FirebaseAuthRepository implements IAuthRepository {
         return Stream.value(null);
       }
 
-      return _db
-          .collection('users')
-          .doc(firebaseUser.uid)
-          .snapshots()
-          .map((snapshot) {
-        final data = snapshot.data();
-        return AppUser(
-          uid: firebaseUser.uid,
-          name: data?['name'] as String?,
-          email: firebaseUser.email ?? '',
-          verifiedEmail: firebaseUser.emailVerified,
-          partnerId: data?['partnerId'] as String?,
-        );
+      return _db.collection('users').doc(firebaseUser.uid).snapshots().switchMap((userSnap) {
+        final userData = userSnap.data();
+        final partnerId = userData?['partnerId'] as String?;
+
+        if (partnerId == null || partnerId.isEmpty) {
+          return Stream.value(AppUser.fromMap(
+            userData!, 
+            firebaseUser.uid, 
+            firebaseUser.email, 
+            firebaseUser.emailVerified, 
+            ''));
+        }
+
+        return Stream.fromFuture(_db.collection('users').doc(partnerId).get()).map((partnerSnap) {
+          final partnerName = partnerSnap.data()?['name'] as String? ?? "";
+          
+          return AppUser.fromMap(
+            userData!, 
+            firebaseUser.uid, 
+            firebaseUser.email ?? '', 
+            firebaseUser.emailVerified,
+            partnerName,
+          );
+        });
       });
     });
   }
-
-  @override
-  Future<AppUser?> getAuthenticatedUserData() async {
-  final firebaseUser = _auth.currentUser;
-  if (firebaseUser == null) return null;
-
-  try {
-    final doc = await _db.collection('users').doc(firebaseUser.uid).get();
-    if (!doc.exists) return null;
-
-    final data = doc.data();
-    final String? partnerId = data?['partnerId'] as String?;
-    String partnerName = "";
-    
-    if (partnerId != null && partnerId.isNotEmpty) {
-      try {
-        final partnerDoc = await _db.collection('users').doc(partnerId).get();
-        if (partnerDoc.exists) {
-          partnerName = partnerDoc.data()?['name'] as String? ?? "Usuario sin nombre";
-        } else {
-          partnerName = "Vínculo no encontrado";
-        }
-      } catch (e) {
-        partnerName = "Error al cargar vínculo";
-      }
-    }
-
-    return AppUser(
-      uid: firebaseUser.uid,
-      email: firebaseUser.email ?? '',
-      name: data?['name'] as String?,
-      verifiedEmail: firebaseUser.emailVerified,
-      partnerId: partnerId,
-      partnerName: partnerName,
-    );
-  } catch (e) {
-    return null;
-  }
-}
 
   @override
   Future<void> signInWithEmail(String email, String password) async {

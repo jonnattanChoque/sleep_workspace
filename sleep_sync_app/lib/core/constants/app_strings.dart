@@ -1,8 +1,8 @@
 class AppStrings {
-  // Auth Headers
+  // Generic
   static const title = "SleepSync";
   static const changeTheme = "Cambiando tu tema...";
-
+  static const buttonConfirm = "Confirmar";
 
   // Form Fields
   static const emailLabel = "Correo electrónico";
@@ -50,11 +50,11 @@ class AppStrings {
   static const step1 = 'Comparte este código con tu pareja.';
   static const step2 = 'Tu pareja lo ingresa en su aplicación.';
   static const step3 = '¡Empiecen a sincronizar su sueño!';
-  static const haveCodeAction = 'Ya tengo un código';
+  static const haveCodeAction = 'Vincular código';
   static const copiedCode = '¡Código copiado al portapapeles!';
   static const shareCodeMessage = '¡Hola! Vincúlate conmigo en Sleep Sync para sincronizar nuestro descanso. Mi código es: ';
   static const creatingCode = 'Creando código...';
-  static const linkPartnerTitle = 'Vincular con tu pareja';
+  static const linkPartnerTitle = 'Vincular código';
   static const linkPartnerSubtitle = "Ingresa el código que aparece en el dispositivo de tu pareja para comenzar.";
   static const enterLinkCodeHint = 'Ingresa el código de vínculación';
   static const linkAction = 'Vincular';
@@ -93,4 +93,8 @@ class AppStrings {
   // Push
   static const pushOn = "Notificaciones activas";
   static const pushOff = "Notificaciones inactivas";
+  // Average
+  static const hours = " horas";
+  static const sleepGoalTitle = "Meta de sueño diaria";
+  static const sleepGoalChanged = "Tiempo de sueño guardado";
 }

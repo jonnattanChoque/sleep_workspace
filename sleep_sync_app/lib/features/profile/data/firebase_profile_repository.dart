@@ -22,6 +22,23 @@ class FirebaseProfileRepository implements IProfileRepository {
 
     return ProfileFailure.none;
   }
+
+  @override
+  Future<ProfileFailure> updateSleepGoal(double hours) async {
+    final user = _auth.currentUser;
+    if (user == null) ProfileFailure.noAuthenticatedUser;
+
+    try {
+      await _db.collection('users').doc(user?.uid).update({
+        'sleepGoal': hours,
+      });
+      return ProfileFailure.none;
+    } on FirebaseException catch (e) {
+      return _handleFirebaseException(e.code);
+    } catch (e) {
+      return ProfileFailure.serverError;
+    }
+  }
   
   @override
   Future<void> updatePhoto(String url) {
@@ -65,6 +82,7 @@ class FirebaseProfileRepository implements IProfileRepository {
       return ProfileFailure.serverError;
     }
   }
+  
   ProfileFailure _handleFirebaseException(String code) {
     return switch (code) {
       'permission-denied' => ProfileFailure.permissionDenied,
