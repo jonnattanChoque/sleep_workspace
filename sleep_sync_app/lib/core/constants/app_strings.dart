@@ -71,6 +71,7 @@ class AppStrings {
   static const tabProfile = 'Perfil';
 
   // Profile Screen
+  static const averageSleep = 'Promedio';
   static const profileAverageSleep = 'Mi promedio';
   static const togetherAverageSleep = 'Nuestro promedio';
   static const profileSleepGoal = 'Meta de Sueño';

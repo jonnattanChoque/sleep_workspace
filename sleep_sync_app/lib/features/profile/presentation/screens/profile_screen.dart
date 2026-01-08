@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
+import 'package:sleep_sync_app/core/helper/lottie_quality.dart';
 import 'package:sleep_sync_app/core/provider/theme_provider.dart';
 import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
@@ -207,7 +208,8 @@ class ProfileScreen extends ConsumerWidget {
   
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
+    final isVisible = ref.watch(partnerInfoVisibleProvider);
+    final partner = ref.watch(partnerProvider).value;
     ref.listen<AsyncValue>(unlinkingControllerProvider, (previous, next) {
       if (previous is AsyncLoading && !next.isLoading) {
         final actionState = next.value;
@@ -240,9 +242,25 @@ class ProfileScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
         children: [
-          _buildIdentityCard(user),
+          _buildIdentityCard(ref),
           const SizedBox(height: 30),
-          _buildMetricsGrid(context, ref),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: isVisible && partner != null
+                ? TwonDSExpandedTile(
+                    leading: TwonDSLottie(lottiePath: getLottieAssetByQuality(partner.stats.avgQuality), size: 80),
+                    title: partner.name ?? '',
+                    subtitle: partner.email,
+                    body: Text(
+                      "${AppStrings.averageSleep}: ${partner.stats.avgHours} h",
+                      style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
+                    ),
+                    onClose: () => ref.read(partnerInfoVisibleProvider.notifier).update((state) => false),
+                  )
+                : const SizedBox.shrink(),
+          ),
+          isVisible && partner != null ? const SizedBox(height: 30) : const SizedBox(height: 0),
+          _buildMetricsGrid(context, ref, partner),
           const SizedBox(height: 50),
           _showlinkedButton(context, ref, user),
           const SizedBox(height: 50),
@@ -251,29 +269,25 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildIdentityCard(AppUser userApp) {
-    final isLinked = userApp.partnerName.toString().isNotEmpty && userApp.partnerName != null;
+  Widget _buildIdentityCard(WidgetRef ref) {
+    final isLinked = user.partnerName.toString().isNotEmpty && user.partnerName != null;
 
     return TwonDSUserHeader(
-      name: userApp.name ?? "", 
-      email: userApp.email,
-      avatar: const TwonDSAvatar(
-        imageUrl: "",
-        radius: 30,
-      ),
+      name: user.name ?? "", 
+      email: user.email,
+      avatar: TwonDSLottie(lottiePath: getLottieAssetByQuality(user.stats.avgQuality), size: 80),
       bottomChild: TwonDSBadge(
-        text: isLinked ? userApp.partnerName ?? "" : AppStrings.noLinkend,
+        text: isLinked ? user.partnerName ?? "" : AppStrings.noLinkend,
         icon: TwonDSIcons.link,
         customColor: isLinked ? null : Colors.grey.withValues(alpha: 0.7),
+        onTap: () => ref.read(partnerInfoVisibleProvider.notifier).update((state) => !state),
       )
     );
   }
 
-  Widget _buildMetricsGrid(BuildContext context, WidgetRef ref) {
+  Widget _buildMetricsGrid(BuildContext context, WidgetRef ref, AppUser? partner) {
     final myStats = user.stats;
     final String myAvgValue = "${myStats.avgHours.toStringAsFixed(1)}h";
-
-    final partner = ref.watch(partnerProvider).value;
     final String partnerAvgValue = "${partner?.stats.avgHours.toStringAsFixed(1)}h";
 
     String linkAvgValue = "--";

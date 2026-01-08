@@ -12,3 +12,5 @@ final profileControllerProvider = StateNotifierProvider<ProfileController, Async
   final repo = ref.watch(profileRepositoryProvider);
   return ProfileController(repo, ref);
 });
+
+final partnerInfoVisibleProvider = StateProvider<bool>((ref) => false);

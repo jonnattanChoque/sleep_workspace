@@ -5,6 +5,7 @@ import 'package:sleep_sync_app/core/constants/app_strings.dart';
 import 'package:sleep_sync_app/core/provider/loader_provider.dart';
 import 'package:sleep_sync_app/core/provider/theme_provider.dart';
 import 'package:sleep_sync_app/core/services/storage_service.dart';
+import 'package:sleep_sync_app/core/utils/enum_lottie.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_wrapper.dart';
 import 'firebase_options.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
@@ -67,7 +68,7 @@ class MyApp extends ConsumerWidget {
               child: isThemeLoading || loaderState.isLoading
                   ? TwnDSOverlayLoader(
                       key: const ValueKey('theme_loader'),
-                      lottiePath: 'assets/animations/loading.json',
+                      lottiePath: StateLottie.loading.path,
                       message: loaderState.message ?? AppStrings.changeTheme,
                     )
                   : const SizedBox.shrink(),
