@@ -57,12 +57,14 @@ class TwonDSStatCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        color: isDark ? accentColor : colorScheme.onSurface, 
-                        fontSize: 14, 
-                        fontWeight: FontWeight.w600
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: TextStyle(
+                          color: isDark ? accentColor : colorScheme.onSurface, 
+                          fontSize: 14, 
+                          fontWeight: FontWeight.w600
+                        ),
                       ),
                     ),
                     Icon(
@@ -78,7 +80,7 @@ class TwonDSStatCard extends StatelessWidget {
                   const Spacer(),
                   Icon(
                     centerIcon,
-                    size: 40,
+                    size: 30,
                     color: (valueColor ?? accentColor).withAlpha(180),
                   ),
                 ],

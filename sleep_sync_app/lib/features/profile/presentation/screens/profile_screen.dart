@@ -7,6 +7,7 @@ import 'package:sleep_sync_app/core/constants/app_strings.dart';
 import 'package:sleep_sync_app/core/provider/theme_provider.dart';
 import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
+import 'package:sleep_sync_app/features/link/presentation/linking_provider.dart';
 import 'package:sleep_sync_app/features/unlink/presentation/unlinking_provider.dart';
 import 'package:sleep_sync_app/features/profile/domain/enum/profile_failure.dart';
 import 'package:sleep_sync_app/features/profile/presentation/profile_provider.dart';
@@ -242,14 +243,6 @@ class ProfileScreen extends ConsumerWidget {
           _buildIdentityCard(user),
           const SizedBox(height: 30),
           _buildMetricsGrid(context, ref),
-          const SizedBox(height: 20),
-          _buildActionItem(
-            Icons.security_outlined, 
-            AppStrings.profileConfiguration,
-            () {
-              _openSettings(context, ref, user);
-            }
-          ),
           const SizedBox(height: 50),
           _showlinkedButton(context, ref, user),
           const SizedBox(height: 50),
@@ -277,45 +270,85 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildMetricsGrid(BuildContext context, WidgetRef ref) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-        flex: 3,
-        child: TwonDSStatCard(
-          title: "Tu Meta",
-          value: "${user.sleepGoal}h",
-          valueColor: TwonDSColors.secondText,
-          height: 160,
-          centerIcon: Icons.alarm_on_rounded,
-          iconTap: TwonDSIcons.edit,
-          onTap: () => _showSleepGoalPicker(context, ref, user.sleepGoal ?? 0)
-        ),
-      ),
-      const SizedBox(width: 16),
-      Expanded(
-        flex: 3,
-        child: TwonDSStatCard(
-          title: AppStrings.profileAverageSleep,
-          value: "7.5h",
-          valueColor: const Color(0xFF3F51B5),
-          iconTap: TwonDSIcons.eye,
-          centerIcon: TwonDSIcons.linked,
-          height: 140,
-          onTap: () {},
-        ),
-      ),
-      ],
-    );
-  }
+    final myStats = user.stats;
+    final String myAvgValue = "${myStats.avgHours.toStringAsFixed(1)}h";
 
-  Widget _buildActionItem(IconData icon, String title,VoidCallback onTap) {
-    return TwonDSActionTile(
-      icon: icon,
-      title: title,
-      onTap: onTap,
-      iconTap: TwonDSIcons.edit,
-    );
+    final partner = ref.watch(partnerProvider).value;
+    final String partnerAvgValue = "${partner?.stats.avgHours.toStringAsFixed(1)}h";
+
+    String linkAvgValue = "--";
+    if (partner != null) {
+      final totalH = myStats.totalHours + partner.stats.totalHours;
+      final totalR = myStats.totalRecords + partner.stats.totalRecords;
+      linkAvgValue = totalR > 0 ? "${(totalH / totalR).toStringAsFixed(1)}h" : "0.0h";
+    }
+
+    return Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 3,
+                child: TwonDSStatCard(
+                  title: AppStrings.profileGoalTitle,
+                  value: "${user.sleepGoal}h",
+                  valueColor: TwonDSColors.secondText,
+                  height: 130,
+                  centerIcon: Icons.alarm_on_rounded,
+                  iconTap: TwonDSIcons.edit,
+                  onTap: () => _showSleepGoalPicker(context, ref, user.sleepGoal ?? 0)
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                flex: 2,
+                child: TwonDSStatCard(
+                  title: AppStrings.editProfileButton,
+                  value: AppStrings.profileConfiguration,
+                  valueColor: TwonDSColors.secondText,
+                  centerIcon: Icons.security,
+                  height: 130,
+                  onTap: () => _openSettings(context, ref, user)
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 16),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 2,
+                child: TwonDSStatCard(
+                  title: AppStrings.profileAverageSleep,
+                  value: myAvgValue,
+                  valueColor: TwonDSColors.secondText,
+                  iconTap: TwonDSIcons.eye,
+                  centerIcon: TwonDSIcons.onePerson,
+                  height: 150,
+                  onTap: () {},
+                )
+                
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                flex: 3,
+                child: TwonDSStatCard(
+                  title: AppStrings.togetherAverageSleep,
+                  value: "$linkAvgValue -- $partnerAvgValue",
+                  valueColor: TwonDSColors.secondText,
+                  iconTap: TwonDSIcons.eye,
+                  centerIcon: TwonDSIcons.twoPerson,
+                  height: 150,
+                  onTap: () {},
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
   }
 
   Widget _showlinkedButton(BuildContext context, WidgetRef ref, AppUser user) {
