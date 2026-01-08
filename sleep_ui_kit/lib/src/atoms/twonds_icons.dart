@@ -23,5 +23,7 @@ class TwonDSIcons {
   static const IconData lock = Icons.lock;
   static const IconData edit = Icons.edit_rounded;
   static const IconData eye = Icons.remove_red_eye_sharp;
-  static const IconData linked = Icons.link;
+  static const IconData onePerson = Icons.person;
+  static const IconData twoPerson = Icons.people_alt;
+  static const IconData security = Icons.security_outlined;
 }

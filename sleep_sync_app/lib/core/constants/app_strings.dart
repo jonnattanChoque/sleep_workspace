@@ -71,7 +71,8 @@ class AppStrings {
   static const tabProfile = 'Perfil';
 
   // Profile Screen
-  static const profileAverageSleep = 'Promedio';
+  static const profileAverageSleep = 'Mi promedio';
+  static const togetherAverageSleep = 'Nuestro promedio';
   static const profileSleepGoal = 'Meta de Sueño';
   static const profileEditGoal = 'Editar Meta';
   static const profileConfiguration = 'Configuración';
@@ -82,6 +83,7 @@ class AppStrings {
   static const profileSliderUnlink = 'Desliza para desvincular';
   static const profileSliderPlaceholder = 'Desvincular';
   static const profileChangingTheme = "Sincronizando tu modo...";
+  static const profileGoalTitle = "Tu Meta diaria";
   // Edit profile
   static const editProfileSubtitle = "¿Cómo quieres que te llamemos?";
   static const nameTextield = "Ingresa tu nombre";
