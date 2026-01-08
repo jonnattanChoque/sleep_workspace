@@ -4,6 +4,7 @@ export 'src/atoms/twonds_icons.dart';
 export 'src/atoms/twonds_assets.dart';
 export 'src/atoms/twonds_badge.dart';
 export 'src/atoms/twonds_avatar.dart';
+export 'src/atoms/twonds_lottie.dart';
 
 export 'src/molecules/twonds_text_field.dart';
 export 'src/molecules/twonds_elevated_button.dart';

@@ -57,3 +57,6 @@ flutter:
 
   assets:
     - assets/animations/loading.json
+    - assets/animations/bad.json
+    - assets/animations/regular.json
+    - assets/animations/good.json
