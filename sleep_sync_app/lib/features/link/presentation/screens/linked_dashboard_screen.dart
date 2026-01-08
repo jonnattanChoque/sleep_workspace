@@ -122,7 +122,7 @@ class _UnlinkedDashboardContentState extends ConsumerState<_LinkedDashboardConte
       final bool alreadyLoggedToday = logs.any((record) => record.id == todayId);
 
       if (!alreadyLoggedToday && mounted) {
-        _showSleepLogModal(context, ref, 8.0);
+        _showSleepLogModal(context, ref, 0.0);
       }
     });
   }
@@ -172,7 +172,7 @@ class _UnlinkedDashboardContentState extends ConsumerState<_LinkedDashboardConte
         final isLoggedToday = _checkIfLoggedToday(logs);
         return Column(
           children: [
-            if (isLoggedToday)
+            if (!isLoggedToday)
               TwonDSElevatedButton(text: "text", onPressed: () {
                 _showSleepLogModal(context, ref, 0);
               }),
