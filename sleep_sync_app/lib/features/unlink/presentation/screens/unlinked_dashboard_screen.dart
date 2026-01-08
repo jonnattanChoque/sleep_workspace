@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
-import 'package:sleep_sync_app/features/linking/presentation/linking_provider.dart';
+import 'package:sleep_sync_app/features/unlink/presentation/unlinking_provider.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
 class UnlinkedDashboard extends ConsumerWidget {
@@ -29,7 +29,7 @@ class _UnlinkedDashboardContentState extends ConsumerState<_UnlinkedDashboardCon
   void initState() {
     super.initState();
     Future.microtask(() => 
-      ref.read(linkingControllerProvider.notifier).initLinkingFlow()
+      ref.read(unlinkingControllerProvider.notifier).initLinkingFlow()
     );
   }
 
@@ -52,7 +52,7 @@ class _UnlinkedDashboardContentState extends ConsumerState<_UnlinkedDashboardCon
           
           if (code.isNotEmpty) {
             Navigator.pop(context);
-            await ref.read(linkingControllerProvider.notifier).linkWithPartner(code);
+            await ref.read(unlinkingControllerProvider.notifier).linkWithPartner(code);
           }
         },
       ),
@@ -61,10 +61,10 @@ class _UnlinkedDashboardContentState extends ConsumerState<_UnlinkedDashboardCon
 
   @override
   Widget build(BuildContext context) {
-    final linkingState = ref.watch(linkingControllerProvider);
+    final linkingState = ref.watch(unlinkingControllerProvider);
     final code = linkingState.valueOrNull;
 
-    ref.listen<AsyncValue>(linkingControllerProvider, (previous, next) {
+    ref.listen<AsyncValue>(unlinkingControllerProvider, (previous, next) {
         if (next is AsyncError && previous is! AsyncError) {
           final errorMessage = next.error.toString();
           TwnDSMessage.show(context, errorMessage.toString(), isError: true);

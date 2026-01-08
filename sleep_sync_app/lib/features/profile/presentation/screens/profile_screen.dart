@@ -7,7 +7,7 @@ import 'package:sleep_sync_app/core/constants/app_strings.dart';
 import 'package:sleep_sync_app/core/provider/theme_provider.dart';
 import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
-import 'package:sleep_sync_app/features/linking/presentation/linking_provider.dart';
+import 'package:sleep_sync_app/features/unlink/presentation/unlinking_provider.dart';
 import 'package:sleep_sync_app/features/profile/domain/enum/profile_failure.dart';
 import 'package:sleep_sync_app/features/profile/presentation/profile_provider.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
@@ -155,7 +155,7 @@ class ProfileScreen extends ConsumerWidget {
           
           if (code.isNotEmpty) {
             Navigator.pop(context);
-            await ref.read(linkingControllerProvider.notifier).linkWithPartner(code);
+            await ref.read(unlinkingControllerProvider.notifier).linkWithPartner(code);
           }
         },
       ),
@@ -207,7 +207,7 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
-    ref.listen<AsyncValue>(linkingControllerProvider, (previous, next) {
+    ref.listen<AsyncValue>(unlinkingControllerProvider, (previous, next) {
       if (previous is AsyncLoading && !next.isLoading) {
         final actionState = next.value;
         if (actionState!.message.isNotEmpty) {

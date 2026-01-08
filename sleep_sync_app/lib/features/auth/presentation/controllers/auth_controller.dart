@@ -1,58 +1,15 @@
 import 'dart:async';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
 import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
 import 'package:sleep_sync_app/features/auth/domain/repositories/i_auth_repository.dart';
-import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
 import 'package:sleep_sync_app/features/auth/domain/enums/auth_failure.dart';
-import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
-class AuthState {
-  final bool isLoading;
-  final String? error;
-  final String? successMessage;
-  final Color background;
-  final DateTime? timestamp;
-  final AppUser? user;
-
-  AuthState({
-    this.isLoading = false,
-    this.error,
-    this.successMessage,
-    this.background = Colors.transparent,
-    this.timestamp,
-    this.user,
-  });
-
-  factory AuthState.initial() => AuthState();
-
-  AuthState copyWith({
-    bool? isLoading,
-    String? error,
-    String? successMessage,
-    Color? background,
-    bool? isEmailVerificationSent,
-    DateTime? timestamp,
-    final AppUser? user
-  }) {
-    return AuthState(
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
-      successMessage: successMessage,
-      background: background ?? this.background,
-      timestamp: timestamp ?? this.timestamp,
-      user: user ?? this.user,
-    );
-  }
-}
-
-class AuthController extends StateNotifier<AuthState> {
+class AuthController extends StateNotifier<AsyncValue<AppUser?>> {
   final IAuthRepository _authRepository;
   StreamSubscription<AppUser?>? _userSubscription;
 
-  AuthController(this._authRepository) : super(AuthState.initial()) {
+  AuthController(this._authRepository) : super(const AsyncValue.data(null)) {
     _listenToUserChanges();
   }
 
@@ -60,7 +17,7 @@ class AuthController extends StateNotifier<AuthState> {
     _userSubscription?.cancel();
     _userSubscription = _authRepository.onAuthStateChanged.listen((user) {
       if (mounted) {
-        state = state.copyWith(user: user);
+        state = AsyncValue.data(user);
       }
     });
   }
@@ -74,73 +31,68 @@ class AuthController extends StateNotifier<AuthState> {
   Future<void> signUp(String email, String password, String name) async {
     if (!_validate(email, password, name)) return;
 
-    _initState();
-    
-    try {
-      await _authRepository.signUpWithEmail(email.trim(), password.trim(), name.trim());
-      state = state.copyWith(
-        isLoading: false, 
-        isEmailVerificationSent: true,
-        successMessage: AppStrings.verificationSent,
-        background: TwonDSColors.success,
-        timestamp: DateTime.now()
-      );
-    } catch (e) {
-      _setErrorState(_mapFailureToMessage(e));
-    }
+    state = const AsyncLoading();
+    state = await AsyncValue.guard<AppUser?>(() async {
+      try {
+        await _authRepository.signUpWithEmail(email.trim(), password.trim(), name.trim());
+        return null;
+      } catch (e) {
+        throw _mapFailureToMessage(e);
+      }
+    });
   }
 
   Future<void> login(String email, String password) async {
     if (!_validate(email, password)) return;
-    _initState();
-
-    try {
-      await _authRepository.signInWithEmail(email.trim(), password.trim());
-      state = state.copyWith(isLoading: false);
-    } catch (e) {
-      _setErrorState(_mapFailureToMessage(e));
-    }
+  
+    state = const AsyncLoading();
+    state = await AsyncValue.guard<AppUser?>(() async {
+      try {
+        await _authRepository.signInWithEmail(email.trim(), password.trim());
+        return null;
+      } catch (e) {
+        throw _mapFailureToMessage(e);
+      }
+    });
   }
 
   Future<void> loginWithGoogle() async {
-    _initState();
-
-    try {
-      await _authRepository.signInWithGoogle();
-      state = state.copyWith(isLoading: false);
-    } catch (e) {
-      _setErrorState(_mapFailureToMessage(e));
-    }
+    state = const AsyncLoading();
+    state = await AsyncValue.guard<AppUser?>(() async {
+      try {
+        await _authRepository.signInWithGoogle();
+        return null;
+      } catch (e) {
+        throw _mapFailureToMessage(e);
+      }
+    });
   }
 
   Future<void> sendPasswordResetEmail(String email) async {
     if (email.trim().isEmpty || !email.contains('@')) {
-      _setErrorState(AppStrings.errorInvalidEmail);
+      state = AsyncError(AppStrings.errorInvalidEmail, StackTrace.current);
       return;
     }
 
-    _initState();
-    try {
-      await _authRepository.sendPasswordResetEmail(email.trim());
-      state = state.copyWith(
-        isLoading: false, 
-        successMessage: AppStrings.resetPasswordSent,
-        background: TwonDSColors.success,
-        timestamp: DateTime.now()
-      );
-    } catch (e) {
-      _setErrorState(_mapFailureToMessage(e));
-    }
+    state = const AsyncLoading();
+    state = await AsyncValue.guard<AppUser?>(() async {
+      try {
+        await _authRepository.sendPasswordResetEmail(email.trim());
+        return null;
+      } catch (e) {
+        throw _mapFailureToMessage(e);
+      }
+    });
   }
 
   Future<void> signOut() async {
     await _authRepository.signOut();
   }
-  
-  void resetState() {
-    state = AuthState.initial();
-  }
 
+  void resetState() {
+    state = const AsyncValue.data(null);
+  }
+  
   // Private functions
   bool _validate(String email, String password, [String? name]) {
     if (name != null && name.isEmpty) {
@@ -163,30 +115,7 @@ class AuthController extends StateNotifier<AuthState> {
   }
 
   void _sendValidate(String message) {
-    state = state.copyWith(
-      isLoading: false, 
-      error: message, 
-      background: TwonDSColors.error,
-      timestamp: DateTime.now()
-    );
-  }
-
-  void _setErrorState(String message) {
-    state = state.copyWith(
-      isLoading: false,
-      error: message,
-      background: TwonDSColors.error,
-      timestamp: DateTime.now(),
-    );
-  }
-
-  void _initState() {
-    state = state.copyWith(
-      isLoading: true, 
-      error: null,
-      successMessage: null,
-      background: Colors.transparent,
-    );
+    state = AsyncError(message, StackTrace.current);
   }
 
   String _mapFailureToMessage(Object e) {
@@ -204,8 +133,3 @@ class AuthController extends StateNotifier<AuthState> {
     };
   }
 }
-
-final authControllerProvider = StateNotifierProvider<AuthController, AuthState>((ref) {
-  final repository = ref.watch(authRepositoryProvider); 
-  return AuthController(repository);
-});

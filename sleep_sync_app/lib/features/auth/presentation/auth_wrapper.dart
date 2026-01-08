@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
 import 'package:sleep_sync_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:sleep_sync_app/features/auth/presentation/screens/verification_pending_screen.dart';
-import 'package:sleep_sync_app/features/sleep/presentation/screens/dashboard_screen.dart';
+import 'package:sleep_sync_app/features/link/presentation/screens/dashboard_screen.dart';
 
 class AuthWrapper extends ConsumerWidget {
   const AuthWrapper({super.key});

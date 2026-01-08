@@ -97,4 +97,17 @@ class AppStrings {
   static const hours = " horas";
   static const sleepGoalTitle = "Meta de sueño diaria";
   static const sleepGoalChanged = "Tiempo de sueño guardado";
+
+  // Linking
+  static const registerSleepTitle = "¿Cuánto dormiste anoche?";
+  static const registerSleepSuccess = "Registro guardado";
+
+  static String sleepMessage(int quality) {
+    switch (quality) {
+      case 5: return "¡Increíble! Meta cumplida.";
+      case 4: return "Muy buen descanso.";
+      case 3: return "Podría ser mejor, intenta dormir más hoy.";
+      default: return "Necesitas recuperar horas de sueño.";
+    }
+  }
 }

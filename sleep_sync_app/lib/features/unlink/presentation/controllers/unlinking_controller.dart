@@ -2,20 +2,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
 import 'package:sleep_sync_app/core/provider/loader_provider.dart';
 import 'package:sleep_sync_app/core/utils/code_generator.dart';
-import 'package:sleep_sync_app/features/linking/data/repository/firebase_linking_repository.dart';
-import 'package:sleep_sync_app/features/linking/domain/enum/linking_failure.dart';
-import 'package:sleep_sync_app/features/linking/domain/repository/i_linking_repository.dart';
+import 'package:sleep_sync_app/features/unlink/data/repository/firebase_unlinking_repository.dart';
+import 'package:sleep_sync_app/features/unlink/domain/enum/linking_failure.dart';
+import 'package:sleep_sync_app/features/unlink/domain/repository/i_unlinking_repository.dart';
 
-class LinkingController extends StateNotifier<AsyncValue<String?>> {
-  final ILinkingRepository _repository;
+class UnlinkingController extends StateNotifier<AsyncValue<String?>> {
+  final IUnlinkingRepository _repository;
   final Ref ref;
 
-  LinkingController(this._repository, this.ref) : super(const AsyncLoading());
+  UnlinkingController(this._repository, this.ref) : super(const AsyncLoading());
 
   Future<void> initLinkingFlow() async {
     state = const AsyncLoading();
     try {
-      final user = (_repository as FirebaseLinkingRepository).currentFirebaseUser;
+      final user = (_repository as FirebaseUnlinkingRepository).currentFirebaseUser;
       if (user == null) throw Exception("No hay sesión activa");
 
       String? existingCode = await _repository.getUserLinkCode(user.uid);
@@ -43,7 +43,7 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
     state = const AsyncLoading<String?>().copyWithPrevious(state);
 
     state = const AsyncLoading();
-    final myUid = (_repository as FirebaseLinkingRepository).currentFirebaseUser!.uid;
+    final myUid = (_repository as FirebaseUnlinkingRepository).currentFirebaseUser!.uid;
 
     final result = await _repository.linkWithPartner(
       myUid: myUid,

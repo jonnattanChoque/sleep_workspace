@@ -3,7 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
-import 'package:sleep_sync_app/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
+import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -35,14 +36,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<AuthState>(authControllerProvider, (previous, next) {
-      if (next.timestamp != previous?.timestamp) {
-        if (next.error != null) {
-          _showTwonSnackBar(context, next.error!, true);
-        }
-        
-        if (next.successMessage != null) {
-          _showTwonSnackBar(context, next.successMessage!, false);
+    ref.listen<AsyncValue<AppUser?>>(authControllerProvider, (previous, next) {
+      if (next is AsyncError) {
+        _showTwonSnackBar(
+          context, 
+          next.error.toString(), 
+          true,
+        );
+      }
+
+      if (previous is AsyncLoading && next is AsyncData) {
+        if (!isLogin) {
+          _showTwonSnackBar(context, AppStrings.verificationSent, false);
+        } else if (emailController.text.isNotEmpty && passwordController.text.isEmpty) {
+          _showTwonSnackBar(context, AppStrings.resetPasswordSent, false);
         }
       }
     });
