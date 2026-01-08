@@ -4,8 +4,8 @@ import 'package:sleep_sync_app/core/constants/app_strings.dart';
 import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
 import 'package:sleep_sync_app/features/profile/presentation/screens/profile_screen.dart';
-import 'package:sleep_sync_app/features/sleep/presentation/screens/linked_dashboard_screen.dart';
-import 'package:sleep_sync_app/features/sleep/presentation/screens/unlinked_dashboard_screen.dart';
+import 'package:sleep_sync_app/features/link/presentation/screens/linked_dashboard_screen.dart';
+import 'package:sleep_sync_app/features/unlink/presentation/screens/unlinked_dashboard_screen.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
 
@@ -46,7 +46,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     int selectedIndex = ref.watch(dashboardIndexProvider);
     final authState = ref.watch(authControllerProvider);
-    final user = authState.user;
+    final user = authState.value;
 
     if (user == null) {
       return const Center(
@@ -198,7 +198,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: hasPartner 
-                  ? const LinkedDashboardScreen() 
+                  ? const LinkedDashboard() 
                   : const UnlinkedDashboard(),
             ),
           ),

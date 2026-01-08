@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:sleep_sync_app/features/linking/domain/enum/linking_failure.dart';
-import 'package:sleep_sync_app/features/linking/domain/repository/i_linking_repository.dart';
+import 'package:sleep_sync_app/features/unlink/domain/enum/linking_failure.dart';
+import 'package:sleep_sync_app/features/unlink/domain/repository/i_unlinking_repository.dart';
 
-class FirebaseLinkingRepository implements ILinkingRepository {
+class FirebaseUnlinkingRepository implements IUnlinkingRepository {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
