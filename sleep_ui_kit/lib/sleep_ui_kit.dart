@@ -17,6 +17,7 @@ export 'src/molecules/twonds_stat_card.dart';
 export 'src/molecules/twonds_modal_tile.dart';
 export 'src/molecules/twonds_switch_tile.dart';
 export 'src/molecules/twonds_snackbar.dart';
+export 'src/molecules/twonds_banner.dart';
 
 export 'src/organisms/radial_sleep_chart.dart';
 export 'src/organisms/twonds_input_dialog_modal.dart';

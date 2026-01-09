@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
 import 'package:sleep_sync_app/features/link/data/repository/firebase_linking_repository.dart';
+import 'package:sleep_sync_app/features/link/domain/models/sleep_chart_model.dart';
 import 'package:sleep_sync_app/features/link/domain/models/sleep_record_model.dart';
 import 'package:sleep_sync_app/features/link/domain/repository/i_linking_repository.dart';
 import 'package:sleep_sync_app/features/link/presentation/controller/linking_controller.dart';
@@ -22,6 +23,14 @@ final linkingControllerProvider = StateNotifierProvider<LinkingController, Async
   return LinkingController(repository, ref, currentSleepGoal);
 });
 
+final sleepChartPresenterProvider = Provider.family<AsyncValue<SleepChartState>, String>((ref, userId) {
+  final logsAsync = ref.watch(sleepLogsProvider);
+  final controller = ref.read(linkingControllerProvider.notifier);
+
+  return logsAsync.whenData((logs) {
+    return controller.transformToUIState(logs, userId);
+  });
+});
 
 final partnerProvider = StreamProvider.autoDispose<AppUser?>((ref) {
   final currentUser = ref.watch(authControllerProvider).value;

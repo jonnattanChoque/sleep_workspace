@@ -14,3 +14,5 @@ final profileControllerProvider = StateNotifierProvider<ProfileController, Async
 });
 
 final partnerInfoVisibleProvider = StateProvider<bool>((ref) => false);
+
+final notificationsSwitchProvider = StateProvider<bool>((ref) => false);

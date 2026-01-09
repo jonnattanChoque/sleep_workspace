@@ -9,7 +9,7 @@ import 'package:sleep_sync_app/core/utils/enum_lottie.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_wrapper.dart';
 import 'firebase_options.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
-
+import 'package:intl/date_symbol_data_local.dart';  
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +24,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await initializeDateFormatting('es_ES', null);
   
   runApp(
     ProviderScope(

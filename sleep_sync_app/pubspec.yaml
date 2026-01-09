@@ -42,6 +42,7 @@ dependencies:
   rxdart: ^0.28.0
 
   shared_preferences: ^2.3.5
+  audioplayers: ^6.1.0
 
 dev_dependencies:
   flutter_test:
@@ -60,3 +61,5 @@ flutter:
     - assets/animations/bad.json
     - assets/animations/regular.json
     - assets/animations/good.json
+    - assets/animations/searching.json
+    - assets/sounds/send.mp3

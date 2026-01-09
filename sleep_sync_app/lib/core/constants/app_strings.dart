@@ -41,8 +41,7 @@ class AppStrings {
   static const String confirmMessage = 'Tendrás que volver a ingresar para ver tus datos de sueño.';
   static const String confirmAction = 'Cerrar sesión';
 
-  // Dashboard sin vínculo
-  static const unlinkedTitle = 'Mejor en pareja';
+  // Dashboard unlink
   static const unlinkedSubtitle = 'Sincroniza tu descanso y cuida de quien más quieres.';
   static const yourLinkCode = 'TU CÓDIGO DE VÍNCULACIÓN';
   static const copy = 'Copiar';
@@ -64,6 +63,17 @@ class AppStrings {
   static const errorInvalidLinkCode = 'El código ingresado no existe. Verifica y vuelve a intentarlo.';
   static const errorLinkedWithSelf = 'No puedes vincularte con tu propio código.';
   static const errorPartnerAlreadyLinked = 'Esta persona ya está vinculada con alguien más.';
+
+  // Dashboard link
+  static const linkedTitle = 'Tu descanso hoy';
+  static const linkRecordTitle = "¡Registra tu sueño!";
+  static const linkRecordButton = "Registrar";
+  static const linkPartnerRecordTitle = "sigue soñando?";
+  static const linkPartnerRecordMessage = "Recuerdale registrar su sueño";
+  static const linkPartnerRecorsend = "🐝 ¡Zumbido enviado a";
+  static const streakTitle = "Tu racha";
+  static const days = "días";
+  static const sleepDiff = "Diferencia sueño";
   
   // Tabs
   static const tabToday = 'Hoy';
@@ -72,11 +82,12 @@ class AppStrings {
 
   // Profile Screen
   static const averageSleep = 'Promedio';
-  static const profileAverageSleep = 'Mi promedio';
+  static const profileAverageSleep = 'Promedio';
   static const togetherAverageSleep = 'Nuestro promedio';
   static const profileSleepGoal = 'Meta de Sueño';
   static const profileEditGoal = 'Editar Meta';
   static const profileConfiguration = 'Configuración';
+  static const profileConfigurationInfo = "Editar mis preferencias";
   static const profileEditProfile = 'Editar Perfil';
   static const profileTheme = "Modo Oscuro";
   static const profilePush = 'Notificaciones';
@@ -84,7 +95,7 @@ class AppStrings {
   static const profileSliderUnlink = 'Desliza para desvincular';
   static const profileSliderPlaceholder = 'Desvincular';
   static const profileChangingTheme = "Sincronizando tu modo...";
-  static const profileGoalTitle = "Tu Meta diaria";
+  static const profileGoalTitle = "Meta diaria";
   // Edit profile
   static const editProfileSubtitle = "¿Cómo quieres que te llamemos?";
   static const nameTextield = "Ingresa tu nombre";

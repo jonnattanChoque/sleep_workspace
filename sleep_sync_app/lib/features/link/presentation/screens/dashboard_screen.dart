@@ -8,7 +8,6 @@ import 'package:sleep_sync_app/features/link/presentation/screens/linked_dashboa
 import 'package:sleep_sync_app/features/unlink/presentation/screens/unlinked_dashboard_screen.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
-
 final dashboardIndexProvider = StateProvider<int>((ref) => 0);
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -174,9 +173,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
         );
       case 2:
-        return ProfileScreen(
-          key: const ValueKey('tab_profile'),
-          user: user,
+        return const ProfileScreen(
+          key: ValueKey('tab_profile')
         );
       default:
         return const SizedBox.shrink();
