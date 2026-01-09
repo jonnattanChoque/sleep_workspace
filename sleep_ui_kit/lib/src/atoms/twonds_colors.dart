@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
 
 class TwonDSColors {
-  
-  static const List<Color> qualityGradient = [
-    Color(0xFFEF4444),
-    Color(0xFFF59E0B),
-    Color(0xFF10B981),
-  ];
-
   static const Color primaryNight = Color(0xFF1A237E);
   static const Color secondText = Color(0xFF3F51B5);
   static const Color accentMoon = Color(0xFFFFD54F);

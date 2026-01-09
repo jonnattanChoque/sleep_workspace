@@ -81,7 +81,7 @@ class _UnlinkedDashboardContentState extends ConsumerState<_UnlinkedDashboardCon
       mainAxisSize: MainAxisSize.min,
       children: [
         const SizedBox(height: 10),
-        Text(AppStrings.unlinkedTitle, style: TwonDSTextStyles.h1(context)),
+        Text(AppStrings.linkedTitle, style: TwonDSTextStyles.h1(context)),
         const SizedBox(height: 12),
         Text(
           AppStrings.unlinkedSubtitle, 

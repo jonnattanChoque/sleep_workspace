@@ -9,7 +9,8 @@ class TwonDSExpandedTile extends StatelessWidget {
   final String? subtitle;
   final Widget? body;
   final Widget? trailing;
-  final VoidCallback? onClose;
+  final IconData? onTapIcon;
+  final VoidCallback? onTap;
 
   const TwonDSExpandedTile({
     super.key,
@@ -18,7 +19,8 @@ class TwonDSExpandedTile extends StatelessWidget {
     this.subtitle,
     this.body,
     this.trailing,
-    this.onClose,
+    this.onTapIcon,
+    this.onTap,
   });
 
   @override
@@ -70,14 +72,13 @@ class TwonDSExpandedTile extends StatelessWidget {
           ),
         ),
         
-        // El botón de cerrar posicionado en la esquina
-        if (onClose != null)
+        if (onTap != null)
           Positioned(
             top: 8,
             right: 8,
             child: IconButton(
-              icon: const Icon(Icons.close, size: 18),
-              onPressed: onClose,
+              icon: Icon(onTapIcon ?? Icons.close, size: 18),
+              onPressed: onTap,
               splashRadius: 20,
               visualDensity: VisualDensity.compact,
               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
