@@ -22,6 +22,12 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
     return ((hours / userSleepGoal) * 5).clamp(1, 5).round();
   }
 
+  String formatHours(double hours) {
+    return hours % 1 == 0 
+        ? hours.toInt().toString() 
+        : hours.toStringAsFixed(1);
+  }
+
   SleepChartState transformToUIState(List<SleepRecord> logs, String userId) {
     final today = DateTime.now();
     final todayId = "${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
@@ -35,7 +41,7 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
     // 2. Cálculos de negocio
     final double rawProgress = record.goal > 0 ? (record.hours / record.goal) : 0.0;
     final double progress = rawProgress.clamp(0.0, 1.0);
-    final String percent = (progress * 100).toString();
+    final String percent = formatHours(progress * 100);
 
     final (lottie, color) = switch (record.quality) {
       5 => (StateLottie.good.path, Colors.greenAccent),
@@ -82,7 +88,7 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
       final String docId = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
       final quality = calculateQuality(hours);
 
-      final existingLogs = ref.read(sleepLogsProvider).value ?? [];
+      final existingLogs = ref.read(sleepLogsProvider(currentUser.uid)).value ?? [];
       final bool isUpdate = existingLogs.any((r) => r.id == docId);
       final SleepRecord? oldRecord = isUpdate ? existingLogs.firstWhere((r) => r.id == docId) : null;
       
@@ -115,6 +121,7 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
       );
       await _repository.addSleepRecord(record, updatedUser);
       
+      if (!mounted) return;
       state = const AsyncData(AppStrings.registerSleepSuccess);
     } catch (e, st) {
       state = AsyncError(e, st);

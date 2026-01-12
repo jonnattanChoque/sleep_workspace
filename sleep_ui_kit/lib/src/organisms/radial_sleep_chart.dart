@@ -83,14 +83,14 @@ class _InteractiveSleepChartState extends State<TwonDSRadialChart> {
 
     return [
       PieChartSectionData(
-        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+        color: widget.color,
         value: widget.progress * 100,
         radius: radius,
         showTitle: false,
       ),
       // Sección de Fondo
       PieChartSectionData(
-        color: widget.color,
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
         value: (1 - widget.progress) * 100,
         radius: 14,
         showTitle: false,

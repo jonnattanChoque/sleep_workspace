@@ -1,9 +1,9 @@
 class SleepRecord {
   final String id;
-  final String userId; // Añadido
+  final String userId;
   final DateTime date;
   final double hours;
-  final double goal;   // Añadido para el cálculo de progreso
+  final double goal;
   final int quality;
 
   SleepRecord({
@@ -20,7 +20,8 @@ class SleepRecord {
       'date': date.toIso8601String(),
       'hours': hours,
       'quality': quality,
-      'goal': goal
+      'goal': goal,
+      'userId': userId,
     };
   }
 

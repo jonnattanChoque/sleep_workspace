@@ -4,5 +4,6 @@ abstract class IProfileRepository {
   Future<ProfileFailure> updateName(String newName);
   Future<void> updatePhoto(String url);
   Future<ProfileFailure> unlink();
+  Future<void> removeToken();
   Future<ProfileFailure> updateSleepGoal(double hours);
 }

@@ -123,7 +123,10 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
 
   Future<void> _checkAndShowModal() async {
     try {
-      final logs = await ref.read(sleepLogsProvider.future);
+      final user = ref.read(authControllerProvider).value;
+      if (user == null) return;
+
+      final logs = await ref.read(sleepLogsProvider(user.uid).future);
       if (!mounted) return;
 
       final alreadyLogged = ref.read(linkingControllerProvider.notifier).hasRecordForToday(logs);
@@ -164,13 +167,13 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
 
   @override
   Widget build(BuildContext context) {
-    final String formattedDate = DateFormat('EEEE, d MMMM', 'es_ES').format(DateTime.now());
-    final sleepLogsAsync = ref.watch(sleepLogsProvider);
-    final partner = ref.watch(partnerProvider).value;
     final authState = ref.watch(authControllerProvider);
-    final user = authState.value;
+    final partnerAsync = ref.watch(partnerProvider);
+    final sleepLogsAsync = ref.watch(sleepLogsProvider(authState.value?.uid ?? ""));
 
-    if (user == null) return const SizedBox.shrink();
+    final String formattedDate = DateFormat('EEEE, d MMMM', 'es_ES').format(DateTime.now());
+
+    if (authState.value == null) return const SizedBox.shrink();
     
     ref.listen<AsyncValue>(linkingControllerProvider, (previous, next) {
       if (previous?.isLoading == true && !next.isLoading && !next.hasError) {
@@ -189,29 +192,41 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
         );
       }
     });
-
-    final myStats = ref.watch(sleepChartPresenterProvider(user.uid));
-    final partnerStats = ref.watch(sleepChartPresenterProvider(partner?.uid ?? ""));
-
-    return sleepLogsAsync.when(
+    
+    return authState.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, stack) => Center(child: Text('Error: $err')),
-      data: (logs) {
+      error: (err, _) => Center(child: Text('Error Auth: $err')),
+      data: (user) {
+        if (user == null) return const SizedBox.shrink();
 
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildHeader(formattedDate),
-            const SizedBox(height: 18),
-            _buildMyRegistrationNudge(myStats),
-            const SizedBox(height: 18),
-            _buildPushPartnet(partnerStats, user, partner),
-            const SizedBox(height: 18),
-            _buildDualSleepCharts(user, partner, myStats, partnerStats),
-            
-            const SizedBox(height: 18),
-            _buildMetricsGrid()
-          ],
+        return partnerAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, _) => Center(child: Text('Error Partner: $err')),
+          data: (partner) {
+            final myStats = ref.watch(sleepChartPresenterProvider(user.uid));
+            final partnerStats = ref.watch(sleepChartPresenterProvider(partner?.uid ?? ""));
+
+            return sleepLogsAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, _) => Center(child: Text('Error Logs: $err')),
+              data: (logs) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildHeader(formattedDate),
+                    const SizedBox(height: 18),
+                    _buildMyRegistrationNudge(myStats),
+                    const SizedBox(height: 18),
+                    _buildPushPartnet(partnerStats, user, partner),
+                    const SizedBox(height: 18),
+                    _buildDualSleepCharts(user, partner, myStats, partnerStats),
+                    const SizedBox(height: 18),
+                    _buildMetricsGrid(user, partner, myStats, partnerStats),
+                  ],
+                );
+              },
+            );
+          },
         );
       },
     );
@@ -277,28 +292,28 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
       children: [
         myTodayStats.maybeWhen(
           data: (myData) => TwonDSRadialChart(
-              label: "Tú: ${myData.hours == 0.0 ? 0 : myData.hours} h",
+              label: "Tú: ${myData.hours == 0.0 ? 0 : ref.read(linkingControllerProvider.notifier).formatHours(myData.hours)} h",
               progress: myData.progress == 0.0 ? 99 : myData.progress,
               lottiePath: myData.lottiePath,
               color: myData.chartColor, 
               onTap: () => _showTooltip(
                 context, 
                 myData.progress, 
-                "${user.name} hoy dormiste ${myData.hours == 0.0 ? 0 : myData.hours} horas, lo que corresponde al ${myData.percent}% de tu meta",
+                "${user.name} hoy dormiste ${myData.hours == 0.0 ? 0 : ref.read(linkingControllerProvider.notifier).formatHours(myData.hours)} horas, lo que corresponde al ${myData.percent}% de tu meta",
               ),
             ),
           orElse: () => const CircularProgressIndicator(),
         ),
         partnerTodayStats.maybeWhen(
           data: (pData) => TwonDSRadialChart(
-            label: "${partner?.name}: ${pData.hours == 0.0 ? 0 : pData.hours} h",
+            label: "${partner?.name}: ${pData.hours == 0.0 ? 0 : ref.read(linkingControllerProvider.notifier).formatHours(pData.hours)} h",
             progress: pData.progress == 0.0 ? 99 : pData.progress,
             lottiePath: pData.lottiePath,
             color: pData.chartColor, 
             onTap: () => _showTooltip(
               context, 
               pData.progress, 
-              "${partner?.name} hoy durmió ${pData.hours == 0.0 ? 0 : pData.hours} horas, lo que corresponde al ${pData.percent}% de su meta",
+              "${partner?.name} hoy durmió ${pData.hours == 0.0 ? 0 : ref.read(linkingControllerProvider.notifier).formatHours(pData.hours)} horas, lo que corresponde al ${pData.percent}% de su meta",
             ),
           ),
           orElse: () => const CircularProgressIndicator(),
@@ -336,7 +351,19 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
     );
   }
 
-  Widget _buildMetricsGrid() {
+  Widget _buildMetricsGrid(AppUser user, AppUser? partner, AsyncValue<SleepChartState> userTodayStats, AsyncValue<SleepChartState> partnerTodayStats) {
+    final int myRecords = user.stats.totalRecords;
+    final int partnerRecords = partner?.stats.totalRecords ?? 0;
+    int streak = (myRecords == partnerRecords) ? myRecords : 0;
+    
+    final userData = userTodayStats.value;
+    final partnerData = partnerTodayStats.value;
+    final double myHours = userData?.hours ?? 0;
+    final double partnerHours = partnerData?.hours ?? 0;
+    final double diff = myHours - partnerHours;
+    final String diffText = diff == 0.0 ? "0 h" : "${ref.read(linkingControllerProvider.notifier).formatHours(diff.abs())} h";
+    final bool isPositive = diff >= 0;
+
     return Column(
         children: [
           Row(
@@ -346,12 +373,11 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
                 flex: 3,
                 child: TwonDSStatCard(
                   title: AppStrings.streakTitle,
-                  value: "${6} ${AppStrings.days}",
+                  value: "$streak ${AppStrings.days}",
                   valueColor: const Color.fromARGB(255, 223, 85, 61),
                   height: 150,
                   centerIcon: Icons.local_fire_department,
-                  iconTap: TwonDSIcons.edit,
-                  onTap: () {}
+                  onTap: null
                 ),
               ),
               const SizedBox(width: 16),
@@ -359,11 +385,11 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
                 flex: 3,
                 child: TwonDSStatCard(
                   title: AppStrings.sleepDiff,
-                  value: "7 h",
+                  value: diffText,
                   valueColor: const Color.fromARGB(255, 161, 159, 162),
-                  centerIcon: TwonDSIcons.minus,
+                  centerIcon: isPositive ? TwonDSIcons.plus : TwonDSIcons.minus,
                   height: 150,
-                  onTap: () {}
+                  onTap: null
                 ),
               ),
             ],

@@ -12,8 +12,8 @@ final linkingRepositoryProvider = Provider<IlinkingRepository>((ref) {
   return FirebaseLinkingRepository();
 });
 
-final sleepLogsProvider = StreamProvider<List<SleepRecord>>((ref) {
-  return ref.watch(linkingRepositoryProvider).onSleepLogsChanged;
+final sleepLogsProvider = StreamProvider.family<List<SleepRecord>, String>((ref, userId) {
+  return ref.watch(linkingRepositoryProvider).onSleepLogsChanged(userId);
 });
 
 final linkingControllerProvider = StateNotifierProvider<LinkingController, AsyncValue<String?>>((ref) {
@@ -24,7 +24,7 @@ final linkingControllerProvider = StateNotifierProvider<LinkingController, Async
 });
 
 final sleepChartPresenterProvider = Provider.family<AsyncValue<SleepChartState>, String>((ref, userId) {
-  final logsAsync = ref.watch(sleepLogsProvider);
+  final logsAsync = ref.watch(sleepLogsProvider(userId));
   final controller = ref.read(linkingControllerProvider.notifier);
 
   return logsAsync.whenData((logs) {
@@ -53,7 +53,7 @@ final partnerProvider = StreamProvider.autoDispose<AppUser?>((ref) {
           snapshot.id,
           data['email'] as String?,
           data['verified'] as bool?,
-          currentUser.name,
+          data['name'],
         );
       });
 });
