@@ -8,7 +8,7 @@ class TwonDSStatCard extends StatelessWidget {
   final double height;
   final IconData? iconTap;
   final IconData? centerIcon;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const TwonDSStatCard({
     super.key,
@@ -68,7 +68,7 @@ class TwonDSStatCard extends StatelessWidget {
                       ),
                     ),
                     Icon(
-                      iconTap ?? Icons.arrow_forward_ios,
+                      iconTap,
                       size: 17,
                       color: isDark 
                           ? colorScheme.onSurface.withValues(alpha: 0.7)

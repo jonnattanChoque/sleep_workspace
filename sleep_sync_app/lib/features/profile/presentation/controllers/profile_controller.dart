@@ -50,6 +50,9 @@ class ProfileController extends StateNotifier<AsyncValue<ProfileActionState>> {
 
     final storage = _ref.read(storageServiceProvider);
     storage.setNotificationsEnabled(isOn);
+    if (!isOn) {
+      _repository.removeToken();
+    }
 
     state = AsyncData(ProfileActionState(
       message: isOn ? AppStrings.pushOn : AppStrings.pushOff,

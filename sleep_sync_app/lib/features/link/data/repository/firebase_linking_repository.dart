@@ -11,13 +11,10 @@ class FirebaseLinkingRepository implements IlinkingRepository {
   User? get currentFirebaseUser => _auth.currentUser;
 
   @override
-  Stream<List<SleepRecord>> get onSleepLogsChanged {
-    final user = _auth.currentUser; 
-    if (user == null) return Stream.value([]);
-
+  Stream<List<SleepRecord>> onSleepLogsChanged(String userId) {
     return _db
         .collection('users')
-        .doc(user.uid)
+        .doc(userId)
         .collection('sleep_logs')
         .orderBy('date', descending: true)
         .limit(7)

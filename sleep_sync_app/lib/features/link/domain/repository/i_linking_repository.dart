@@ -2,7 +2,7 @@ import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
 import 'package:sleep_sync_app/features/link/domain/models/sleep_record_model.dart';
 
 abstract class IlinkingRepository {
-  Stream<List<SleepRecord>> get onSleepLogsChanged;
+  Stream<List<SleepRecord>> onSleepLogsChanged(String userId);
   Future<void> addSleepRecord(SleepRecord record, AppUser appUser);
   Future<void> sendNudge(String toUserId, String fromUserName);
 }
