@@ -61,6 +61,17 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
     return logs.any((record) => record.id == todayId);
   }
 
+  Future<void> sendNudge({
+    required String toUserId, 
+    required String fromUserName
+  }) async {
+    try {
+      await _repository.sendNudge(toUserId, fromUserName);
+    } catch (e) {
+      debugPrint("Error: $e");
+    }
+  }
+
   Future<void> saveRecord(double hours) async {
     final currentUser = ref.read(authControllerProvider).value;
     if (currentUser == null) return;

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
+import 'package:sleep_sync_app/core/services/push_service.dart';
 import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
 import 'package:sleep_sync_app/features/link/domain/models/sleep_chart_model.dart';
@@ -135,6 +136,14 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
     }
   }
 
+  void _setupNotifications() {
+    final user = ref.read(authControllerProvider).value;
+    if (user != null) {
+      NotificationService().initialize(user.uid);
+      ref.read(notificationServiceProvider).saveMyToken(user.uid);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -143,6 +152,7 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAndShowModal();
+      _setupNotifications();
     });
   }
 
@@ -195,9 +205,10 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
             const SizedBox(height: 18),
             _buildMyRegistrationNudge(myStats),
             const SizedBox(height: 18),
-            _buildDualSleepCharts(user, partner, myStats, partnerStats),
+            _buildPushPartnet(partnerStats, user, partner),
             const SizedBox(height: 18),
-            _buildPushPartnet(partnerStats, partner),
+            _buildDualSleepCharts(user, partner, myStats, partnerStats),
+            
             const SizedBox(height: 18),
             _buildMetricsGrid()
           ],
@@ -296,7 +307,14 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
     );
   }
 
-  Widget _buildPushPartnet(AsyncValue<SleepChartState> partnerTodayStats, AppUser? partner) {
+  Widget _buildPushPartnet(AsyncValue<SleepChartState> partnerTodayStats, AppUser user, AppUser? partner) {
+    if (partner?.notificationsEnabled == false) {
+      return TwonDSBanner(
+        text: "${partner?.name} ${AppStrings.linkPartnerRecordTitle}",
+        actionLabel: "",
+        onTap: () {},
+      );
+    }
     return partnerTodayStats.maybeWhen(
       data: (data) => data.hours == 0
         ? TwonDSUserHeader(
@@ -307,7 +325,7 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
               onPressed: () async {
                 await _audioPlayer.play(AssetSource('sounds/send.mp3'));
                 HapticFeedback.vibrate();
-                _sendNudge();
+                _sendNudge(user);
                 TwnDSMessage.show(context, "${AppStrings.linkPartnerRecorsend} ${partner?.name}", isError: false);
               },
             )
@@ -368,5 +386,10 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
     );
   }
 
-  void _sendNudge() { }
+  void _sendNudge(AppUser user) async { 
+    await ref.read(linkingControllerProvider.notifier).sendNudge(
+      toUserId: user.uid,
+      fromUserName: user.name ?? "Empty",
+    );
+  }
 }

@@ -4,4 +4,5 @@ import 'package:sleep_sync_app/features/link/domain/models/sleep_record_model.da
 abstract class IlinkingRepository {
   Stream<List<SleepRecord>> get onSleepLogsChanged;
   Future<void> addSleepRecord(SleepRecord record, AppUser appUser);
+  Future<void> sendNudge(String toUserId, String fromUserName);
 }

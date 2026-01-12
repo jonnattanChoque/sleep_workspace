@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
 import 'package:sleep_sync_app/core/provider/loader_provider.dart';
@@ -26,6 +27,29 @@ void main() async {
   );
 
   await initializeDateFormatting('es_ES', null);
+
+  const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'high_importance_channel',
+    'Zumbidos de Sueño',
+    description: 'Este canal se usa para los zumbidos de tu pareja.',
+    importance: Importance.max,
+  );
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  // Inicialización para Android (necesaria para mostrar el banner)
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher'); // Usa el icono de tu app
+  
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
   
   runApp(
     ProviderScope(

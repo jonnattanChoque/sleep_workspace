@@ -38,6 +38,8 @@ class AppUser {
   }
 
   factory AppUser.fromMap(Map<String, dynamic> data, String uid, String? email, bool? verified, String? partnerName) {
+    final notification = data['fcmToken'] == null || data['fcmToken'].toString().isEmpty ? false : true;
+
     return AppUser(
       uid: uid,
       email: email ?? data['email'] ?? '',
@@ -45,7 +47,7 @@ class AppUser {
       name: data['name'] as String?,
       partnerId: data['partnerId'] as String?,
       partnerName: partnerName,
-      notificationsEnabled: data['notificationsEnabled'] as bool? ?? true,
+      notificationsEnabled: notification,
       sleepGoal: (data['sleepGoal'] as num? ?? 8.0).toDouble(),
       pairingCode: data['pairingCode'] as String?,
       stats: UserStats.fromMap(data['stats'] ?? {}),

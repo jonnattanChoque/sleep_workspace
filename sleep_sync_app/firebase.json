@@ -1,1 +1,44 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"sleepapp-65909","appId":"1:503700924110:android:d30e2cf3eab4f5792dd29f","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"sleepapp-65909","appId":"1:503700924110:ios:8ba4b2be8d3d40b22dd29f","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"sleepapp-65909","configurations":{"android":"1:503700924110:android:d30e2cf3eab4f5792dd29f","ios":"1:503700924110:ios:8ba4b2be8d3d40b22dd29f"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "sleepapp-65909",
+          "appId": "1:503700924110:android:d30e2cf3eab4f5792dd29f",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "sleepapp-65909",
+          "appId": "1:503700924110:ios:8ba4b2be8d3d40b22dd29f",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "sleepapp-65909",
+          "configurations": {
+            "android": "1:503700924110:android:d30e2cf3eab4f5792dd29f",
+            "ios": "1:503700924110:ios:8ba4b2be8d3d40b22dd29f"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "disallowLegacyRuntimeConfig": true,
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ]
+}
