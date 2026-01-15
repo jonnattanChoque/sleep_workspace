@@ -11,9 +11,13 @@ import 'package:sleep_sync_app/features/auth/presentation/auth_wrapper.dart';
 import 'firebase_options.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 import 'package:intl/date_symbol_data_local.dart';  
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   final storage = StorageService();
   final bool? isDark = await storage.getThemeMode();
@@ -36,10 +40,9 @@ void main() async {
   );
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-  // Inicialización para Android (necesaria para mostrar el banner)
+  
   const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher'); // Usa el icono de tu app
+      AndroidInitializationSettings('@mipmap/launcher_icon');
   
   const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
@@ -50,6 +53,8 @@ void main() async {
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
+
+  FlutterNativeSplash.remove();
   
   runApp(
     ProviderScope(
@@ -69,6 +74,14 @@ class MyApp extends ConsumerWidget {
     final loaderState = ref.watch(loaderProvider);
     final themeMode = ref.watch(themeModeProvider);
     final isThemeLoading = ref.watch(themeLoadingProvider);
+    final platformBrightness = MediaQuery.platformBrightnessOf(context);
+    final effectiveTheme = switch (themeMode) {
+      ThemeMode.dark => TwonDSTheme.dark,
+      ThemeMode.light => TwonDSTheme.light,
+      ThemeMode.system => platformBrightness == Brightness.dark 
+          ? TwonDSTheme.dark 
+          : TwonDSTheme.light,
+    };
     
     return MaterialApp(
       key: ValueKey(themeMode), 
@@ -79,7 +92,7 @@ class MyApp extends ConsumerWidget {
       darkTheme: TwonDSTheme.dark,
       builder: (context, child) {
         return AnimatedTheme(
-          data: themeMode == ThemeMode.dark ? TwonDSTheme.dark : TwonDSTheme.light,
+          data: effectiveTheme,
           duration: const Duration(milliseconds: 600),
           curve: Curves.easeInOut,
           child: child!,

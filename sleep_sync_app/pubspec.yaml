@@ -48,6 +48,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.0
 
   # Generadores de código para Riverpod
   build_runner: ^2.4.9
@@ -57,9 +59,26 @@ flutter:
   uses-material-design: true
 
   assets:
+    - "assets/images/icon.png"
     - assets/animations/loading.json
     - assets/animations/bad.json
     - assets/animations/regular.json
     - assets/animations/good.json
     - assets/animations/searching.json
     - assets/sounds/send.mp3
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/icon.png"
+
+flutter_native_splash:
+  color: "#0F172A"
+  image: assets/images/icon.png
+
+  android_12:
+    image: assets/images/icon.png
+    icon_background_color: "#0F172A"
+
+  ios: true
+  fullscreen: true

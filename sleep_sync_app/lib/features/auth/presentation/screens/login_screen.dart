@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
+import 'package:sleep_sync_app/core/utils/enum_lottie.dart';
 import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
@@ -30,19 +31,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _showTwonSnackBar(BuildContext context, String message, bool isError) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
     TwnDSMessage.show(context, message.toString(), isError: isError);
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authControllerProvider);
+
     ref.listen<AsyncValue<AppUser?>>(authControllerProvider, (previous, next) {
       if (next is AsyncError) {
-        _showTwonSnackBar(
-          context, 
-          next.error.toString(), 
-          true,
-        );
+        _showTwonSnackBar(context, next.error.toString(), true);
       }
 
       if (previous is AsyncLoading && next is AsyncData) {
@@ -53,136 +51,146 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         }
       }
     });
-    
-    final authState = ref.watch(authControllerProvider);
 
     return Scaffold(
-      body: SingleChildScrollView( 
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 80.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                AppStrings.title,
-                style: TwonDSTextStyles.brandLogo(context)
-              ),
-              const SizedBox(height: 8),
-              const Icon(TwonDSIcons.sleep, size: 80, color: TwonDSColors.accentMoon),
-              const SizedBox(height: 32),
-              Text(
-                isLogin ? AppStrings.loginWelcome : AppStrings.registerTitle,
-                style: TwonDSTextStyles.h1(context),
-              ),
-              const SizedBox(height: 32),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SizeTransition(
-                      sizeFactor: animation,
-                      child: child,
-                    ),
-                  );
-                },
-                child: !isLogin 
-                  ? Column(
-                      key: const ValueKey('nameField'),
-                      children: [
-                        TwonDSTextField(
-                          hint: AppStrings.nameHint, 
-                          icon: TwonDSIcons.profile, 
-                          controller: nameController,
-                        ),
-                        const SizedBox(height: 16),
-                      ],
-                    )
-                  : const SizedBox(key: ValueKey('empty')),
-              ),
-              TwonDSTextField(hint: AppStrings.emailLabel, icon: TwonDSIcons.email, controller: emailController),
-              const SizedBox(height: 16),
-              TwonDSTextField(hint: AppStrings.passwordLabel, icon: TwonDSIcons.lock, controller: passwordController, isPassword: true),
-              const SizedBox(height: 10),
-              isLogin
-                ? Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: authState.isLoading 
-                          ? null 
-                          : () {
-                              final controller = ref.read(authControllerProvider.notifier);
-                              controller.sendPasswordResetEmail(emailController.text);
-                            },
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap, 
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Text(
-                          AppStrings.forgotPassword,
-                          style: TwonDSTextStyles.labelHighlight(context),
-                        ),
-                      ),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-              const SizedBox(height: 24),
-              
-              authState.isLoading 
-                ? const CircularProgressIndicator(color: TwonDSColors.accentMoon)
-                : TwonDSElevatedButton(
-                    text: isLogin ? AppStrings.loginAction : AppStrings.registerAction, 
-                    onPressed: () {
-                      final controller = ref.read(authControllerProvider.notifier);
+      body: authState.when(
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: TwonDSColors.accentMoon),
+        ),
+        error: (err, stack) => _buildLoginForm(context, authState),
+        data: (user) => _buildLoginForm(context, authState),
+      ),
+    );
+  }
 
-                      if (isLogin) {
-                        controller.login(emailController.text, passwordController.text);
-                      } else {
-                        controller.signUp(emailController.text, passwordController.text, nameController.text);
-                      }
-                    }
-                  ),
-              
-              const SizedBox(height: 16),
-              
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    emailController.clear();
-                    passwordController.clear();
-                    nameController.clear();
-                    ref.read(authControllerProvider.notifier).resetState();
-                    isLogin = !isLogin;
-                  });
-                },
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                  tapTargetSize: MaterialTapTargetSize.padded, 
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Text.rich(
-                    TextSpan(
-                      text: isLogin ? AppStrings.noAccount : AppStrings.alreadyHaveAccount,
-                      style: TwonDSTextStyles.bodySmall(context),
-                      children: [
-                        TextSpan(
-                          text: isLogin ? AppStrings.registerAction : AppStrings.loginAction,
-                          style: TwonDSTextStyles.labelHighlight(context),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+  Widget _buildLoginForm(BuildContext context, AsyncValue authState) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 80.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(AppStrings.title, style: TwonDSTextStyles.brandLogo(context)),
+            const SizedBox(height: 8),
+            TwonDSLottie(lottiePath: StateLottie.loading.path, size: 80),
+            const SizedBox(height: 32),
+            Text(
+              isLogin ? AppStrings.loginWelcome : AppStrings.registerTitle,
+              style: TwonDSTextStyles.h1(context),
+            ),
+            const SizedBox(height: 32),
+            _animatedNameTextField(),
+            TwonDSTextField(hint: AppStrings.emailLabel, icon: TwonDSIcons.email, controller: emailController),
+            const SizedBox(height: 16),
+            TwonDSTextField(hint: AppStrings.passwordLabel, icon: TwonDSIcons.lock, controller: passwordController, isPassword: true),
+            
+            isLogin
+              ? _buildForgotPassword(authState, context)
+              : const SizedBox.shrink(),
+            
+            const SizedBox(height: 24),
+            
+            TwonDSElevatedButton(
+              text: isLogin ? AppStrings.loginAction : AppStrings.registerAction,
+              onPressed: authState.isLoading ? null : () {
+                final controller = ref.read(authControllerProvider.notifier);
+                controller.sendPasswordResetEmail(emailController.text);
+              },
+            ),
+            
+            const SizedBox(height: 16),
+            _buildToggleModeButton(context),
+            _buildDivider(context),
+            _googleButton(ref, authState.isLoading),
+          ],
+        ),
+      ),
+    );
+  }
+
+  TextButton _buildToggleModeButton(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        setState(() {
+          emailController.clear();
+          passwordController.clear();
+          nameController.clear();
+          ref.read(authControllerProvider.notifier).resetState();
+          isLogin = !isLogin;
+        });
+      },
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        tapTargetSize: MaterialTapTargetSize.padded, 
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 4),
+        child: Text.rich(
+          TextSpan(
+            text: isLogin ? AppStrings.noAccount : AppStrings.alreadyHaveAccount,
+            style: TwonDSTextStyles.bodySmall(context),
+            children: [
+              TextSpan(
+                text: isLogin ? AppStrings.registerAction : AppStrings.loginAction,
+                style: TwonDSTextStyles.labelHighlight(context),
               ),
-              _buildDivider(context),
-              _googleButton(ref, authState.isLoading),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Align _buildForgotPassword(AsyncValue<dynamic> authState, BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: TextButton(
+        onPressed: authState.isLoading 
+            ? null 
+            : () {
+                final controller = ref.read(authControllerProvider.notifier);
+                controller.sendPasswordResetEmail(emailController.text);
+              },
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap, 
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Text(
+            AppStrings.forgotPassword,
+            style: TwonDSTextStyles.labelHighlight(context),
+          ),
+        ),
+      ),
+    );
+  }
+
+  AnimatedSwitcher _animatedNameTextField() {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: SizeTransition(
+            sizeFactor: animation,
+            child: child,
+          ),
+        );
+      },
+      child: !isLogin 
+        ? Column(
+            key: const ValueKey('nameField'),
+            children: [
+              TwonDSTextField(
+                hint: AppStrings.nameHint, 
+                icon: TwonDSIcons.profile, 
+                controller: nameController,
+              ),
+              const SizedBox(height: 16),
+            ],
+          )
+        : const SizedBox(key: ValueKey('empty')),
     );
   }
 
