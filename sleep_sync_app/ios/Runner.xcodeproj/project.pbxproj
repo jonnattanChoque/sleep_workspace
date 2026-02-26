@@ -67,6 +67,14 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B3A29C237BB7ED2D6E57BE5F /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E61D3ECC2F4E5D580084361B /* flutter_lldb_helper.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = flutter_lldb_helper.py; sourceTree = "<group>"; };
+		E61D3ECD2F4E5D580084361B /* flutter_lldbinit */ = {isa = PBXFileReference; lastKnownFileType = text; path = flutter_lldbinit; sourceTree = "<group>"; };
+		E61D3ECF2F4E5D580084361B /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		E61D3ED02F4E5D580084361B /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		E61D3ED12F4E5D580084361B /* Flutter.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Flutter.podspec; sourceTree = "<group>"; };
+		E61D3ED22F4E5D580084361B /* flutter_export_environment.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = flutter_export_environment.sh; sourceTree = "<group>"; };
+		E61D3ED32F4E5D580084361B /* Generated.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Generated.xcconfig; sourceTree = "<group>"; };
+		E61D3ED42F4E5D580084361B /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +121,7 @@
 		7B69875CF2F33E4BD66DD05C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E61D3ED52F4E5D580084361B /* Flutter */,
 				B3A29C237BB7ED2D6E57BE5F /* Pods_Runner.framework */,
 				4030867336DFF58388B5DDB2 /* Pods_RunnerTests.framework */,
 			);
@@ -165,6 +174,29 @@
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		E61D3ECE2F4E5D580084361B /* ephemeral */ = {
+			isa = PBXGroup;
+			children = (
+				E61D3ECC2F4E5D580084361B /* flutter_lldb_helper.py */,
+				E61D3ECD2F4E5D580084361B /* flutter_lldbinit */,
+			);
+			path = ephemeral;
+			sourceTree = "<group>";
+		};
+		E61D3ED52F4E5D580084361B /* Flutter */ = {
+			isa = PBXGroup;
+			children = (
+				E61D3ECE2F4E5D580084361B /* ephemeral */,
+				E61D3ECF2F4E5D580084361B /* AppFrameworkInfo.plist */,
+				E61D3ED02F4E5D580084361B /* Debug.xcconfig */,
+				E61D3ED12F4E5D580084361B /* Flutter.podspec */,
+				E61D3ED22F4E5D580084361B /* flutter_export_environment.sh */,
+				E61D3ED32F4E5D580084361B /* Generated.xcconfig */,
+				E61D3ED42F4E5D580084361B /* Release.xcconfig */,
+			);
+			path = Flutter;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

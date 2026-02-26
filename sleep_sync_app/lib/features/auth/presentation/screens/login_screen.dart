@@ -94,7 +94,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               text: isLogin ? AppStrings.loginAction : AppStrings.registerAction,
               onPressed: authState.isLoading ? null : () {
                 final controller = ref.read(authControllerProvider.notifier);
-                controller.sendPasswordResetEmail(emailController.text);
+                if (isLogin) {
+                  controller.login(emailController.text, passwordController.text);
+                } else {
+                  controller.signUp(emailController.text, passwordController.text, nameController.text);
+                }
               },
             ),
             

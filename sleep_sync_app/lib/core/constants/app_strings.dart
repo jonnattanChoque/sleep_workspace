@@ -116,6 +116,32 @@ class AppStrings {
   static const registerSleepTitle = "¿Cuánto dormiste anoche?";
   static const registerSleepSuccess = "Registro guardado";
 
+  // Tour
+  static const tourDashboardTodayTitle = "Pestaña Hoy";
+  static const tourDashboardTodayDesc = "Aquí puedes ver información sobre tu sueño de hoy, estadísticas y más.";
+  static const tourDashboardHistoryTitle = "Pestaña Historial";
+  static const tourDashboardHistoryDesc = "Consulta el historial de tus registros de sueño.";
+  static const tourDashboardProfileTitle = "Pestaña Perfil";
+  static const tourDashboardProfileDesc = "Accede a tu información personal y configuración.";
+  static const tourProfileUserTitle = "Tu Perfil";
+  static const tourProfileUserDesc = "Aquí puedes ver y editar tu información básica y estado de vinculación.";
+  static const tourProfilePartnerTitle = "Tu Pareja";
+  static const tourProfilePartnerDesc = "Aquí puedes ver el estado de tu vinculación y acceder a más información de tu pareja.";
+  static const tourProfileGoalTitle = "Meta de Sueño";
+  static const tourProfileGoalDesc = "Establece y ajusta tu objetivo diario de sueño para mantener un buen descanso.";
+  static const tourProfileAverageTitle = "Promedio de Sueño";
+  static const tourProfileAverageDesc = "Consulta tu promedio general de sueño.";
+  static const tourProfileSettingsTitle = "Configuración";
+  static const tourProfileSettingsDesc = "Gestiona tus preferencias y cierra sesión desde aquí.";
+  static const tourProfileunlinkTitle = "Desvincular Pareja";
+  static const tourProfileunlinkDesc = "Desvincula tu cuenta de la de tu pareja si ya no deseas sincronizar tu sueño con ella.";
+  static const tourProfileCodeTitle = "Código de Vínculación";
+  static const tourProfileCodeDesc = "Aquí puedes vincularte con tu pareja usando su código único.";
+  static const tourUnlinkedCodeTitle = "Tu Código de Vínculación";
+  static const tourUnlinkedCodeDesc = "Comparte este código con tu pareja para que puedan sincronizar su sueño juntos.";
+  static const tourUnlinkedButtonTitle = "Vincular Código";
+  static const tourUnlinkedButtonDesc = "Usa este botón para ingresar el código de tu pareja y comenzar a sincronizar su sueño.";
+
   static String sleepMessage(int quality) {
     switch (quality) {
       case 5: return "¡Increíble! Meta cumplida.";

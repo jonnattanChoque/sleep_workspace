@@ -45,6 +45,19 @@
 			<string>UIInterfaceOrientationLandscapeLeft</string>
 			<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>sleepsync</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>sleepsync</string>
+				</array>
+			</dict>
+		</array>
 		<key>UIBackgroundModes</key>
 		<array>
 			<string>fetch</string>
