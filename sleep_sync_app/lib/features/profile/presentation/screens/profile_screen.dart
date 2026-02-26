@@ -3,9 +3,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
 import 'package:sleep_sync_app/core/helper/lottie_quality.dart';
+import 'package:sleep_sync_app/core/helper/product_tour_style.dart';
 import 'package:sleep_sync_app/core/provider/theme_provider.dart';
+import 'package:sleep_sync_app/core/services/storage_service.dart';
 import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
 import 'package:sleep_sync_app/features/link/presentation/linking_provider.dart';
@@ -32,6 +35,56 @@ class _ProfileScreenContent extends ConsumerStatefulWidget {
 
 class _ProfileScreenContentState extends ConsumerState<_ProfileScreenContent>{
   _ProfileScreenContentState();
+
+  bool _isTourAlreadyTriggered = false;
+  bool _isLoadingStorage = true;
+  final GlobalKey _keyUser = GlobalKey();
+  final GlobalKey _keyPartner = GlobalKey();
+  final GlobalKey _keyGoal = GlobalKey();
+  final GlobalKey _keyAverage = GlobalKey();
+  final GlobalKey _keyConfig = GlobalKey();
+  final GlobalKey _keyCode = GlobalKey();
+  final GlobalKey _keyUnlink = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _loadTourStatus();
+    });
+  }
+
+  Future<void> _loadTourStatus() async {
+    final storage = StorageService();
+    final isCompleted = await storage.isTourCompleted(AppTour.profile.name);
+    
+    if (mounted) {
+      setState(() {
+        _isTourAlreadyTriggered = isCompleted;
+        _isLoadingStorage = false; // Ya podemos decidir
+      });
+    }
+  }
+
+  void _startProfileTour(BuildContext showcaseContext) {
+    // Bloqueo de seguridad redundante
+    if (_isTourAlreadyTriggered) return;
+    _isTourAlreadyTriggered = true; 
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(const Duration(milliseconds: 600));
+      if (!mounted) return;
+
+      ShowCaseWidget.of(showcaseContext).startShowCase([
+        _keyUser,
+        _keyPartner,
+        _keyGoal,
+        _keyAverage,
+        _keyConfig,
+        if (ref.read(authControllerProvider).value?.partnerId == null) _keyCode else _keyUnlink,
+      ]);
+    });
+  }
 
   void _openSettings(BuildContext context, WidgetRef ref, AppUser user) {
     showModalBottomSheet(
@@ -229,16 +282,15 @@ class _ProfileScreenContentState extends ConsumerState<_ProfileScreenContent>{
     final user = authState.value;
 
     ref.listen<AsyncValue>(unlinkingControllerProvider, (previous, next) {
-      if (previous is AsyncLoading && !next.isLoading) {
-        final actionState = next.value;
-        if (actionState!.message.isNotEmpty) {
-          TwnDSMessage.show(
-            context, 
-            actionState.message, 
-            isError: actionState.isError,
-          );
+      if (next is AsyncData) {
+      final data = next.value;
+
+      if (data is ProfileActionState) {
+        if (data.message.isNotEmpty) {
+          TwnDSMessage.show(context, data.message, isError: data.isError);
         }
       }
+    }
     });
 
     ref.listen<AsyncValue<ProfileActionState>>(profileControllerProvider, (previous, next) {
@@ -256,40 +308,67 @@ class _ProfileScreenContentState extends ConsumerState<_ProfileScreenContent>{
     });
 
     if (user == null) return const SizedBox.shrink();
+    if (_isLoadingStorage) {
+      return const SizedBox.shrink();
+    }
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Column(
-        children: [
-          _buildIdentityCard(ref, user),
-          const SizedBox(height: 30),
-          _buildPartnerCard(isVisible, partner),
-          isVisible && partner != null ? const SizedBox(height: 30) : const SizedBox(height: 0),
-          _buildMetricsGrid(user, partner),
-          const SizedBox(height: 30),
-          _buildConfigCard(user),
-          const SizedBox(height: 50),
-          _showlinkedButton(user),
-          const SizedBox(height: 50),
-        ],
-      ),
+    return ShowCaseWidget(
+      blurValue: 1,
+      autoPlay: false,
+      onFinish: () async {
+        await StorageService().setTourCompleted(AppTour.profile.name);
+      },
+      builder: (context) => Builder(
+        builder: (context) {
+          if (!_isTourAlreadyTriggered) {
+            _startProfileTour(context);
+          }
+
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Column(
+              children: [
+                _buildIdentityCard(ref, user),
+                const SizedBox(height: 30),
+                _buildPartnerCard(isVisible, partner),
+                isVisible && partner != null ? const SizedBox(height: 30) : const SizedBox(height: 0),
+                _buildMetricsGrid(user, partner),
+                const SizedBox(height: 30),
+                _buildConfigCard(user),
+                const SizedBox(height: 50),
+                _showlinkedButton(user),
+                const SizedBox(height: 50),
+              ],
+            ),
+          );
+        },
+      )
     );
   }
 
   Widget _buildIdentityCard(WidgetRef ref, AppUser user) {
     final isLinked = user.partnerName.toString().isNotEmpty && user.partnerName != null;
-
-    return TwonDSUserHeader(
-      name: user.name ?? "", 
-      email: user.email,
-      avatar: TwonDSLottie(lottiePath: getLottieAssetByQuality(user.stats.avgQuality), size: 80),
-      bottomChild: TwonDSBadge(
-        text: isLinked ? user.partnerName ?? "" : AppStrings.noLinkend,
-        icon: TwonDSIcons.link,
-        customColor: isLinked ? null : Colors.grey.withValues(alpha: 0.7),
-        onTap: () => ref.read(partnerInfoVisibleProvider.notifier).update((state) => !state),
-      )
+    return SleepShowcase(
+      showcaseKey: _keyUser,
+      title: AppStrings.tourProfileUserTitle,
+      description: AppStrings.tourProfileUserDesc,
+      child: TwonDSUserHeader(
+        name: user.name ?? "", 
+        email: user.email,
+        avatar: TwonDSLottie(lottiePath: getLottieAssetByQuality(user.stats.avgQuality), size: 80),
+        bottomChild: SleepShowcase(
+          showcaseKey: _keyPartner,
+          title: AppStrings.tourProfilePartnerTitle,
+          description: AppStrings.tourProfilePartnerDesc,
+          child: TwonDSBadge(
+            text: isLinked ? user.partnerName ?? "" : AppStrings.noLinkend,
+            icon: TwonDSIcons.link,
+            customColor: isLinked ? null : Colors.grey.withValues(alpha: 0.7),
+            onTap: () => ref.read(partnerInfoVisibleProvider.notifier).update((state) => !state),
+          ),
+        )
+      ),
     );
   }
 
@@ -322,27 +401,37 @@ class _ProfileScreenContentState extends ConsumerState<_ProfileScreenContent>{
           children: [
             Expanded(
               flex: 2,
-              child: TwonDSStatCard(
-                title: AppStrings.profileGoalTitle,
-                value: "${user.sleepGoal}h",
-                valueColor: TwonDSColors.secondText,
-                height: 150,
-                centerIcon: Icons.alarm_on_rounded,
-                iconTap: TwonDSIcons.edit,
-                onTap: () => _showSleepGoalPicker(context, ref, user.sleepGoal ?? 0)
+              child: SleepShowcase(
+                showcaseKey: _keyGoal,
+                title: AppStrings.tourProfileGoalTitle,
+                description: AppStrings.tourProfileGoalDesc,
+                child: TwonDSStatCard(
+                  title: AppStrings.profileGoalTitle,
+                  value: "${user.sleepGoal}h",
+                  valueColor: TwonDSColors.secondText,
+                  height: 150,
+                  centerIcon: Icons.alarm_on_rounded,
+                  iconTap: TwonDSIcons.edit,
+                  onTap: () => _showSleepGoalPicker(context, ref, user.sleepGoal ?? 0)
+                ),
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
               flex: 2,
-              child: TwonDSStatCard(
-                title: AppStrings.profileAverageSleep,
-                value: myAvgValue,
-                valueColor: TwonDSColors.secondText,
-                iconTap: TwonDSIcons.eye,
-                centerIcon: TwonDSIcons.person,
-                height: 150,
-                onTap: () {},
+              child: SleepShowcase(
+                showcaseKey: _keyAverage,
+                title: AppStrings.tourProfileAverageTitle,
+                description: AppStrings.tourProfileAverageDesc,
+                child: TwonDSStatCard(
+                  title: AppStrings.profileAverageSleep,
+                  value: myAvgValue,
+                  valueColor: TwonDSColors.secondText,
+                  iconTap: TwonDSIcons.eye,
+                  centerIcon: TwonDSIcons.person,
+                  height: 150,
+                  onTap: () {},
+                ),
               )
             ),
           ],
@@ -352,13 +441,17 @@ class _ProfileScreenContentState extends ConsumerState<_ProfileScreenContent>{
   }
 
   Widget _buildConfigCard(AppUser user) {
-
-    return TwonDSExpandedTile(
-      leading: const Icon(TwonDSIcons.settings),
-      title:  AppStrings.profileConfiguration,
-      subtitle: AppStrings.profileConfigurationInfo,
-      onTapIcon: TwonDSIcons.edit,
-      onTap: () => _openSettings(context, ref, user),
+    return SleepShowcase(
+      showcaseKey: _keyConfig,
+      title: AppStrings.tourProfileSettingsTitle,
+      description: AppStrings.tourProfileSettingsDesc,
+      child: TwonDSExpandedTile(
+        leading: const Icon(TwonDSIcons.settings),
+        title:  AppStrings.profileConfiguration,
+        subtitle: AppStrings.profileConfigurationInfo,
+        onTapIcon: TwonDSIcons.edit,
+        onTap: () => _openSettings(context, ref, user),
+      ),
     );
   }
 
@@ -366,17 +459,27 @@ class _ProfileScreenContentState extends ConsumerState<_ProfileScreenContent>{
     final isLinked = user.partnerName.toString().isNotEmpty && user.partnerName != null;
 
     if (isLinked) {
-      return TwonDSActionSlider(
-        label: AppStrings.profileSliderUnlink,
-        placeholder: AppStrings.profileSliderPlaceholder,
-        onAction: () {
-          ref.read(profileControllerProvider.notifier).unlink();
-        },
+      return SleepShowcase(
+        showcaseKey: _keyUnlink,
+        title: AppStrings.tourProfileunlinkTitle,
+        description: AppStrings.tourProfileunlinkDesc,
+        child: TwonDSActionSlider(
+          label: AppStrings.profileSliderUnlink,
+          placeholder: AppStrings.profileSliderPlaceholder,
+          onAction: () {
+            ref.read(profileControllerProvider.notifier).unlink();
+          },
+        ),
       );
     } else {
-      return TwonDSElevatedButton(
-        text: AppStrings.linkPartnerTitle,
-        onPressed: () => _showLinkModal(context, ref),
+      return SleepShowcase(
+        showcaseKey: _keyCode,
+        title: AppStrings.tourProfileCodeTitle,
+        description: AppStrings.tourProfileCodeDesc,
+        child: TwonDSElevatedButton(
+          text: AppStrings.linkPartnerTitle,
+          onPressed: () => _showLinkModal(context, ref),
+        ),
       );
     }
   }

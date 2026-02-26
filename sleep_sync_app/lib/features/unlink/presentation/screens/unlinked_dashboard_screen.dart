@@ -4,20 +4,39 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
+import 'package:sleep_sync_app/core/helper/product_tour_style.dart';
+import 'package:sleep_sync_app/core/services/push_service.dart';
+import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
 import 'package:sleep_sync_app/features/unlink/presentation/unlinking_provider.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 
 class UnlinkedDashboard extends ConsumerWidget {
-  const UnlinkedDashboard({super.key});
+  final GlobalKey keyCard;
+  final GlobalKey keyButton;
+
+  const UnlinkedDashboard({
+    super.key, 
+    required this.keyCard, 
+    required this.keyButton
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const _UnlinkedDashboardContent();
+    return _UnlinkedDashboardContent(
+      keyCard: keyCard, 
+      keyButton: keyButton
+    );
   }
 }
 
 class _UnlinkedDashboardContent extends ConsumerStatefulWidget {
-  const _UnlinkedDashboardContent();
+  final GlobalKey keyCard;
+  final GlobalKey keyButton;
+
+  const _UnlinkedDashboardContent({
+    required this.keyCard, 
+    required this.keyButton
+  });
 
   @override
   ConsumerState<_UnlinkedDashboardContent> createState() => _UnlinkedDashboardContentState();
@@ -25,9 +44,18 @@ class _UnlinkedDashboardContent extends ConsumerStatefulWidget {
 
 class _UnlinkedDashboardContentState extends ConsumerState<_UnlinkedDashboardContent> {
   
+  void _setupNotifications() {
+    final user = ref.read(authControllerProvider).value;
+    if (user != null) {
+      ref.read(notificationServiceProvider).initialize(user.uid);
+      ref.read(notificationServiceProvider).saveMyToken(user.uid);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    _setupNotifications();
     Future.microtask(() => 
       ref.read(unlinkingControllerProvider.notifier).initLinkingFlow()
     );
@@ -90,85 +118,99 @@ class _UnlinkedDashboardContentState extends ConsumerState<_UnlinkedDashboardCon
         ),
         const SizedBox(height: 18),
         
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark 
-                ? Colors.white.withValues(alpha: .03) 
-                : Theme.of(context).colorScheme.surface,
-            
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
-            ),
-            boxShadow: Theme.of(context).brightness == Brightness.light 
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  )
-                ]
-              : null,
-          ),
-          child: Column(
-            children: [
-              Text(
-                AppStrings.yourLinkCode, 
-                style: TwonDSTextStyles.labelHighlight(context)
-              ),
-              const SizedBox(height: 20),
-              Text(
-                code ?? '---',
-                style: TwonDSTextStyles.displayCode(context),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TwonDSActionButton(
-                    icon: TwonDSIcons.copy, 
-                    label: AppStrings.copy, 
-                    onTap: () {
-                      Clipboard.setData(ClipboardData(text: code ?? "")).then((_) {
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            backgroundColor: TwonDSColors.success,
-                            content: Text(AppStrings.copiedCode),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      });
-                    }
-                  ),
-                  const SizedBox(width: 32),
-                  TwonDSActionButton(
-                    icon: TwonDSIcons.share,
-                    label: AppStrings.share,
-                    onTap: () {
-                      final String shareText = "${AppStrings.shareCodeMessage} $code";
-                      SharePlus.instance.share(ShareParams(text: shareText));
-                    },
-                  ),
-                ],
-              )
-            ],
-          ),
+        SleepShowcase(
+          showcaseKey: widget.keyCard,
+          title: AppStrings.tourUnlinkedCodeTitle,
+          description: AppStrings.tourUnlinkedCodeDesc,
+          child: _buildCardCode(context, code), 
         ),
         
         const SizedBox(height: 25),
         const TwonDSStepRow(number: '1', text: AppStrings.step1),
         const TwonDSStepRow(number: '2', text: AppStrings.step2),
         const TwonDSStepRow(number: '3', text: AppStrings.step3),
-        
         const SizedBox(height: 20),
-        TwonDSElevatedButton(
-          text: AppStrings.haveCodeAction,
-          onPressed: () => _showLinkModal(context),
+
+        SleepShowcase(
+          showcaseKey: widget.keyButton,
+          title: AppStrings.tourUnlinkedButtonTitle,
+          description: AppStrings.tourUnlinkedButtonDesc,
+          child: TwonDSElevatedButton(
+            text: AppStrings.haveCodeAction,
+            onPressed: () => _showLinkModal(context),
+          ), 
         ),
         const SizedBox(height: 24),
       ],
     );
+  }
+
+  Container _buildCardCode(BuildContext context, String? code) {
+    return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+        decoration: BoxDecoration(
+          color: Theme.of(context).brightness == Brightness.dark 
+              ? Colors.white.withValues(alpha: .03) 
+              : Theme.of(context).colorScheme.surface,
+          
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
+          ),
+          boxShadow: Theme.of(context).brightness == Brightness.light 
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                )
+              ]
+            : null,
+        ),
+        child: Column(
+          children: [
+            Text(
+              AppStrings.yourLinkCode, 
+              style: TwonDSTextStyles.labelHighlight(context)
+            ),
+            const SizedBox(height: 20),
+            Text(
+              code ?? '---',
+              style: TwonDSTextStyles.displayCode(context),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TwonDSActionButton(
+                  icon: TwonDSIcons.copy, 
+                  label: AppStrings.copy, 
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: code ?? "")).then((_) {
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          backgroundColor: TwonDSColors.success,
+                          content: Text(AppStrings.copiedCode),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    });
+                  }
+                ),
+                const SizedBox(width: 32),
+                TwonDSActionButton(
+                  icon: TwonDSIcons.share,
+                  label: AppStrings.share,
+                  onTap: () {
+                    final String shareText = "${AppStrings.shareCodeMessage} $code";
+                    SharePlus.instance.share(ShareParams(text: shareText));
+                  },
+                ),
+              ],
+            )
+          ],
+        ),
+      );
   }
 }

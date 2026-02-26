@@ -1,8 +1,14 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
+import 'package:sleep_sync_app/core/helper/product_tour_style.dart';
+import 'package:sleep_sync_app/core/services/storage_service.dart';
 import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
+import 'package:sleep_sync_app/features/link/presentation/dashboard_provider.dart';
 import 'package:sleep_sync_app/features/profile/presentation/screens/profile_screen.dart';
 import 'package:sleep_sync_app/features/link/presentation/screens/linked_dashboard_screen.dart';
 import 'package:sleep_sync_app/features/unlink/presentation/screens/unlinked_dashboard_screen.dart';
@@ -19,11 +25,63 @@ class DashboardScreen extends ConsumerStatefulWidget {
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   final ScrollController _scrollController = ScrollController();
+  bool _tourLauncher = false;
+  final GlobalKey _keyTabToday = GlobalKey();
+  final GlobalKey _keyTabHistory = GlobalKey();
+  final GlobalKey _keyTabProfile = GlobalKey();
+  final GlobalKey _keyCardCodigo = GlobalKey();
+  final GlobalKey _keyBotonVincular = GlobalKey();
+  
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _checkTourStatus();
+      ref.read(dashboardControllerProvider.notifier).syncFeatures();
+    });
+  }
   
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Future<void> _checkTourStatus() async {
+    final storage = StorageService();
+    final isCompleted = await storage.isTourCompleted(AppTour.dashboard.name);
+    
+    if (!isCompleted) {
+      setState(() {
+        _tourLauncher = false;
+      });
+    } else {
+      setState(() {
+        _tourLauncher = true;
+      });
+    }
+  }
+
+  void _startTour(BuildContext showcaseContext) {
+    if (_tourLauncher) return;
+    
+    _tourLauncher = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(const Duration(milliseconds: 600));
+      if (!mounted) return;
+
+      final historyActive = ref.read(dashboardControllerProvider);
+      final List<GlobalKey> steps = [
+        _keyTabToday,
+        if (historyActive) _keyTabHistory,
+        _keyTabProfile,
+        _keyCardCodigo,
+        _keyBotonVincular,
+      ];
+      
+      ShowCaseWidget.of(showcaseContext).startShowCase(steps);
+    });
   }
 
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {
@@ -43,16 +101,43 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isHistoryEnabled = ref.watch(dashboardControllerProvider);
     int selectedIndex = ref.watch(dashboardIndexProvider);
     final authState = ref.watch(authControllerProvider);
     final user = authState.value;
+
+    ref.listen(externalLogoutRequestProvider, (previous, next) {
+      if (next == true) {
+        ref.read(externalLogoutRequestProvider.notifier).state = false;
+        _showLogoutDialog(context, ref);
+      }
+    });
 
     if (user == null) {
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
+  
+    return ShowCaseWidget(
+      blurValue: 1,
+      autoPlay: false,
+      onFinish: () async {
+        await StorageService().setTourCompleted(AppTour.dashboard.name);
+      },
+      builder: (context) => Builder(
+        builder: (showcaseContext) {
 
+          if (!_tourLauncher) {
+            _startTour(showcaseContext);
+          }
+          return _buildDashboardContent(context, selectedIndex, user, isHistoryEnabled);
+        }
+      ),
+    );
+  }
+
+  Scaffold _buildDashboardContent(BuildContext context, int selectedIndex, AppUser user, bool isHistoryEnabled) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: NestedScrollView(
@@ -123,7 +208,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               child: child,
             );
           },
-          child: _buildCurrentTab(selectedIndex, user, ref),
+          child: _buildCurrentTab(selectedIndex, user, ref, isHistoryEnabled),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -146,36 +231,56 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         showSelectedLabels: false,
         showUnselectedLabels: false,
         type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.nights_stay_rounded), label: AppStrings.tabToday),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart_rounded), label: AppStrings.tabHistory),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline_rounded), label: AppStrings.tabProfile),
+        items: [
+          BottomNavigationBarItem(
+            icon: SleepShowcase(
+              showcaseKey: _keyTabToday,
+              title: AppStrings.tourDashboardTodayTitle,
+              description: AppStrings.tourDashboardTodayDesc,
+              child: const Icon(Icons.nights_stay_rounded),
+            ),
+            label: AppStrings.tabToday,
+          ),
+          if (isHistoryEnabled)
+            BottomNavigationBarItem(
+              icon: SleepShowcase(
+                showcaseKey: _keyTabHistory,
+                title: AppStrings.tourDashboardHistoryTitle,
+                description: AppStrings.tourDashboardHistoryDesc,
+                child: const Icon(Icons.bar_chart_rounded),
+              ),
+              label: AppStrings.tabHistory,
+            ),
+          BottomNavigationBarItem(
+            icon: SleepShowcase(
+              showcaseKey: _keyTabProfile,
+              title: AppStrings.tourDashboardProfileTitle,
+              description: AppStrings.tourDashboardProfileDesc,
+              child: const Icon(Icons.person_outline_rounded),
+            ),
+            label: AppStrings.tabProfile,
+          )
         ],
       ),
     );
   }
 
-  Widget _buildCurrentTab(int index, AppUser user, WidgetRef ref) {
-    switch (index) {
+  Widget _buildCurrentTab(int index, AppUser user, WidgetRef ref, bool ishistoryEnabled) {
+    int effectiveIndex = index;
+    if (!ishistoryEnabled && index == 1) {
+      effectiveIndex = 2;
+    }
+    
+    switch (effectiveIndex) {
       case 0:
-        return SizedBox(
-          key: const ValueKey('tab_today'),
-          child: _getTodayTabContent(user, ref),
-        );
+        return SizedBox(key: const ValueKey('tab_today'), child: _getTodayTabContent(user, ref));
       case 1:
         return const SizedBox(
           key: ValueKey('tab_history'),
-          child: Center(
-            child: Text(
-              AppStrings.tabHistory, 
-              style: TextStyle(color: Colors.white)
-            ),
-          ),
+          child: Center(child: Text(AppStrings.tabHistory, style: TextStyle(color: Colors.white))),
         );
       case 2:
-        return const ProfileScreen(
-          key: ValueKey('tab_profile')
-        );
+        return const ProfileScreen(key: ValueKey('tab_profile'));
       default:
         return const SizedBox.shrink();
     }
@@ -197,7 +302,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: hasPartner 
                   ? const LinkedDashboard() 
-                  : const UnlinkedDashboard(),
+                  : UnlinkedDashboard(
+                    keyCard: _keyCardCodigo,
+                    keyButton: _keyBotonVincular,
+                  ),
             ),
           ),
         ],

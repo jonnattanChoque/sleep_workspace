@@ -16,3 +16,5 @@ final authControllerProvider = StateNotifierProvider<AuthController, AsyncValue<
   final repository = ref.watch(authRepositoryProvider);
   return AuthController(repository);
 });
+
+final externalLogoutRequestProvider = StateProvider<bool>((ref) => false);

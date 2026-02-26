@@ -142,7 +142,7 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
   void _setupNotifications() {
     final user = ref.read(authControllerProvider).value;
     if (user != null) {
-      NotificationService().initialize(user.uid);
+      ref.read(notificationServiceProvider).initialize(user.uid);
       ref.read(notificationServiceProvider).saveMyToken(user.uid);
     }
   }
@@ -340,8 +340,8 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
               onPressed: () async {
                 await _audioPlayer.play(AssetSource('sounds/send.mp3'));
                 HapticFeedback.vibrate();
-                _sendNudge(user);
-                TwnDSMessage.show(context, "${AppStrings.linkPartnerRecorsend} ${partner?.name}", isError: false);
+                _sendNudge(user, partner!.uid);
+                TwnDSMessage.show(context, "${AppStrings.linkPartnerRecorsend} ${partner.name ?? ""}", isError: false);
               },
             )
           )
@@ -412,9 +412,9 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
     );
   }
 
-  void _sendNudge(AppUser user) async { 
+  void _sendNudge(AppUser user, String destinationID) async { 
     await ref.read(linkingControllerProvider.notifier).sendNudge(
-      toUserId: user.uid,
+      toUserId: destinationID,
       fromUserName: user.name ?? "Empty",
     );
   }
