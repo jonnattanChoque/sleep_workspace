@@ -364,6 +364,11 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
     final String diffText = diff == 0.0 ? "0 h" : "${ref.read(linkingControllerProvider.notifier).formatHours(diff.abs())} h";
     final bool isPositive = diff >= 0;
 
+    if (streak == 0) {
+      _resetStreak(user.uid);
+      _resetStreak(partner?.uid ?? "");
+    }
+
     return Column(
         children: [
           Row(
@@ -373,7 +378,7 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
                 flex: 3,
                 child: TwonDSStatCard(
                   title: AppStrings.streakTitle,
-                  value: "$streak ${AppStrings.days}",
+                  value: "$streak ${(streak == 1) ? AppStrings.day : AppStrings.days}",
                   valueColor: const Color.fromARGB(255, 223, 85, 61),
                   height: 150,
                   centerIcon: Icons.local_fire_department,
@@ -410,6 +415,14 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
         ),
       ),
     );
+  }
+
+  void _resetStreak(String userId) async {
+    try {
+      await ref.read(linkingControllerProvider.notifier).resetStreak(userId);
+    } catch (e) {
+      debugPrint("Error resetting streak: $e");
+    }
   }
 
   void _sendNudge(AppUser user, String destinationID) async { 

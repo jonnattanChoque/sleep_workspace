@@ -78,6 +78,14 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
     }
   }
 
+  Future<void> resetStreak(String userId) async {
+    try {
+      await _repository.resetStreak(userId);
+    } catch (e) {
+      debugPrint("Error resetting streak: $e");
+    }
+  }
+
   Future<void> saveRecord(double hours) async {
     final currentUser = ref.read(authControllerProvider).value;
     if (currentUser == null) return;

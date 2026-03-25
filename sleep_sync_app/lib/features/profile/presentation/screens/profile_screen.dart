@@ -61,13 +61,12 @@ class _ProfileScreenContentState extends ConsumerState<_ProfileScreenContent>{
     if (mounted) {
       setState(() {
         _isTourAlreadyTriggered = isCompleted;
-        _isLoadingStorage = false; // Ya podemos decidir
+        _isLoadingStorage = false;
       });
     }
   }
 
   void _startProfileTour(BuildContext showcaseContext) {
-    // Bloqueo de seguridad redundante
     if (_isTourAlreadyTriggered) return;
     _isTourAlreadyTriggered = true; 
 
@@ -140,19 +139,6 @@ class _ProfileScreenContentState extends ConsumerState<_ProfileScreenContent>{
                       ),
                     );
                   }
-                ),
-                TwonDSSwitchTile(
-                  icon: Icons.notifications_none,
-                  title: AppStrings.profilePush,
-                  value: ref.watch(notificationsSwitchProvider),
-                  onChanged: (bool isOn) async {
-                    ref.read(notificationsSwitchProvider.notifier).state = isOn;
-                    await ref.read(profileControllerProvider.notifier).togglePush(isOn);
-                    if (!context.mounted) return;
-
-                    await Future.delayed(const Duration(milliseconds: 500));
-                    Navigator.pop(context);
-                  },
                 ),
                 TwonDSSwitchTile(
                   icon: Icons.dark_mode_outlined,
@@ -381,7 +367,7 @@ class _ProfileScreenContentState extends ConsumerState<_ProfileScreenContent>{
               title: partner.name ?? '',
               subtitle: partner.email,
               body: Text(
-                "${AppStrings.averageSleep}: ${partner.stats.avgHours} h",
+                "${AppStrings.averageSleep}: ${partner.stats.avgHours.toStringAsFixed(1)} h",
                 style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
               ),
               onTap: () => ref.read(partnerInfoVisibleProvider.notifier).update((state) => false),
@@ -392,7 +378,7 @@ class _ProfileScreenContentState extends ConsumerState<_ProfileScreenContent>{
 
   Widget _buildMetricsGrid(AppUser user, AppUser? partner) {
     final myStats = user.stats;
-    final String myAvgValue = "${myStats.avgHours.toStringAsFixed(1)}h";
+    final String myAvgValue = "${myStats.avgHours.toStringAsFixed(1)} h";
 
     return Column(
       children: [

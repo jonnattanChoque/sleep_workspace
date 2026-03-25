@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sleep_sync_app/core/services/storage_service.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
 
 final notificationServiceProvider = Provider((ref) => NotificationService(ref));
@@ -11,17 +10,10 @@ class NotificationService {
   final Ref ref;
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
   final _localNotifications = FlutterLocalNotificationsPlugin();
-  final _storage = StorageService();
 
   NotificationService(this.ref);
 
   Future<void> initialize(String userId) async {
-    final bool notificationsEnabledInStorage = await _storage.getNotificationsEnabled() ?? true;
-
-    if (!notificationsEnabledInStorage) {
-      return; 
-    }
-
     const initializationSettings = InitializationSettings(
       android: AndroidInitializationSettings('@mipmap/launcher_icon'),
       iOS: DarwinInitializationSettings(),
@@ -30,7 +22,6 @@ class NotificationService {
     await _localNotifications.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        // AQUÍ es donde capturamos el link cuando el usuario toca la notificación
         final String? payload = response.payload;
         if (payload != null) {
           final uri = Uri.parse(payload);

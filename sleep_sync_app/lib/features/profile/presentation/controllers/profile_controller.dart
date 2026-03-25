@@ -2,7 +2,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sleep_sync_app/core/constants/app_strings.dart';
 import 'package:sleep_sync_app/core/provider/loader_provider.dart';
-import 'package:sleep_sync_app/core/provider/theme_provider.dart';
 import 'package:sleep_sync_app/features/profile/domain/enum/profile_failure.dart';
 import 'package:sleep_sync_app/features/profile/domain/repositories/i_profile_repository.dart';
 
@@ -45,20 +44,6 @@ class ProfileController extends StateNotifier<AsyncValue<ProfileActionState>> {
     }
   }
 
-  Future<void> togglePush(bool isOn) async {
-    state = const AsyncLoading();
-
-    final storage = _ref.read(storageServiceProvider);
-    storage.setNotificationsEnabled(isOn);
-    if (!isOn) {
-      _repository.removeToken();
-    }
-
-    state = AsyncData(ProfileActionState(
-      message: isOn ? AppStrings.pushOn : AppStrings.pushOff,
-      isError: false,
-    ));
-  }
 
   Future<void> unlink() async {
     _ref.read(loaderProvider.notifier).state = const LoaderState(
