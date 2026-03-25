@@ -72,6 +72,7 @@ class AppStrings {
   static const linkPartnerRecordMessage = "Recuerdale registrar su sueño";
   static const linkPartnerRecorsend = "🐝 ¡Zumbido enviado a";
   static const streakTitle = "Tu racha";
+  static const day = "día";
   static const days = "días";
   static const sleepDiff = "Diferencia sueño";
   

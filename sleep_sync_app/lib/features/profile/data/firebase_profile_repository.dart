@@ -83,15 +83,6 @@ class FirebaseProfileRepository implements IProfileRepository {
     }
   }
 
-  @override
-  Future<void> removeToken() async {
-    final myUid = _auth.currentUser?.uid;
-    final userDoc = await FirebaseFirestore.instance.collection('users').doc(myUid).get();
-    if (userDoc.exists) {
-      await userDoc.reference.update({'fcmToken': ""});
-    }
-  }
-  
   ProfileFailure _handleFirebaseException(String code) {
     return switch (code) {
       'permission-denied' => ProfileFailure.permissionDenied,

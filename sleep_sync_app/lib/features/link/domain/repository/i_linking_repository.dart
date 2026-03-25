@@ -5,4 +5,5 @@ abstract class IlinkingRepository {
   Stream<List<SleepRecord>> onSleepLogsChanged(String userId);
   Future<void> addSleepRecord(SleepRecord record, AppUser appUser);
   Future<void> sendNudge(String toUserId, String fromUserName);
+  Future<void> resetStreak(String userId);
 }
