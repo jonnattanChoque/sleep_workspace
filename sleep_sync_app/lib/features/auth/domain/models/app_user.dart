@@ -61,6 +61,8 @@ class UserStats {
   final int totalRecords;
   final double avgHours;
   final double avgQuality;
+  final int streak;
+  final String lastLogDate;
 
   UserStats({
     this.totalHours = 0.0,
@@ -68,6 +70,8 @@ class UserStats {
     this.totalRecords = 0,
     this.avgHours = 0.0,
     this.avgQuality = 0.0,
+    this.streak = 0,
+    this.lastLogDate = "",
   });
 
   factory UserStats.fromMap(Map<String, dynamic> map) {
@@ -77,6 +81,8 @@ class UserStats {
       totalRecords: map['totalRecords'] ?? 0,
       avgHours: (map['avgHours'] ?? 0.0).toDouble(),
       avgQuality: (map['avgQuality'] ?? 0.0).toDouble(),
+      streak: (map['streak'] ?? 0),
+      lastLogDate: (map['lastLogDate'] ?? 0),
     );
   }
 
@@ -86,5 +92,7 @@ class UserStats {
     'totalRecords': totalRecords,
     'avgHours': avgHours,
     'avgQuality': avgQuality,
+    'streak': streak,
+    'lastLogDate': lastLogDate,
   };
 }

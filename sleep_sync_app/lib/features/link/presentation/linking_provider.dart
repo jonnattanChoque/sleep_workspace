@@ -57,3 +57,8 @@ final partnerProvider = StreamProvider.autoDispose<AppUser?>((ref) {
         );
       });
 });
+
+final buzzCooldownTimerProvider = StateProvider<int>((ref) => 0);
+final canSendNudgeProvider = Provider<bool>((ref) {
+  return ref.watch(buzzCooldownTimerProvider) == 0;
+});

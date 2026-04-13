@@ -60,7 +60,7 @@ class FirebaseLinkingRepository implements IlinkingRepository {
   Future<void> resetStreak(String userId) async {
     try {
       await _db.collection('users').doc(userId).update({
-        'stats.totalRecords': 0,
+        'stats.streak': 0,
       });
     } catch (e) {
       rethrow;

@@ -10,6 +10,7 @@ import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
 import 'package:sleep_sync_app/features/link/domain/models/sleep_chart_model.dart';
 import 'package:sleep_sync_app/features/link/presentation/linking_provider.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:audioplayers/audioplayers.dart';
 
@@ -33,7 +34,7 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
   late AudioPlayer _audioPlayer;
 
   void _showSleepLogModal(BuildContext context, WidgetRef ref, double sleepGoal) {
-    double hoursLogged = sleepGoal;
+    Duration durationLogged = Duration(minutes: (sleepGoal * 60).toInt());
 
     showModalBottomSheet(
       context: context,
@@ -43,79 +44,88 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
         builder: (context, ref, child) {
           final isLoading = ref.watch(linkingControllerProvider) is AsyncLoading;
 
-          return PopScope(
-            canPop: !isLoading,
-            onPopInvokedWithResult: (didPop, result) {
-              if (didPop) return;
-            },
-            child: StatefulBuilder(
-              builder: (context, setModalState) {
-                int calculatedQuality = ref.read(linkingControllerProvider.notifier).calculateQuality(hoursLogged);
+          return StatefulBuilder(
+            builder: (context, setModalState) {
+              double hoursAsDouble = durationLogged.inMinutes / 60.0;
+              int calculatedQuality = ref.read(linkingControllerProvider.notifier).calculateQuality(hoursAsDouble);
 
-                return AbsorbPointer(
-                  absorbing: isLoading,
-                  child: TwonDSModalLayout(
-                    title: AppStrings.registerSleepTitle,
-                    children: [
-                      Center(
-                        child: Text(
-                          "${hoursLogged.toStringAsFixed(1)} h",
-                          style: TwonDSTextStyles.h1(context).copyWith(
-                            color: TwonDSColors.accentMoon,
-                          ),
+              return AbsorbPointer(
+                absorbing: isLoading,
+                child: TwonDSModalLayout(
+                  title: AppStrings.registerSleepTitle,
+                  children: [
+                    Center(
+                      child: Text(
+                        "${durationLogged.inHours}h ${durationLogged.inMinutes.remainder(60)}m",
+                        style: TwonDSTextStyles.h1(context).copyWith(
+                          color: TwonDSColors.accentMoon,
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      Slider(
-                        value: hoursLogged,
-                        min: 0,
-                        max: 12,
-                        divisions: 24,
-                        activeColor: TwonDSColors.accentMoon,
-                        onChanged: (val) {
-                          setModalState(() => hoursLogged = val);
-                        },
+                    ),
+                    
+                    const SizedBox(height: 20),
+                    
+                    SizedBox(
+                      height: 200,
+                      child: CupertinoTheme(
+                        data: CupertinoThemeData(
+                          brightness: Theme.of(context).brightness,
+                          textTheme: CupertinoTextThemeData(
+                            pickerTextStyle: TwonDSTextStyles.h2(context).copyWith(
+                              color: TwonDSColors.accentMoon,
+                            )
+                          ),
+                        ),
+                        child: CupertinoTimerPicker(
+                          mode: CupertinoTimerPickerMode.hm,
+                          initialTimerDuration: durationLogged,
+                          onTimerDurationChanged: (newDuration) {
+                            setModalState(() => durationLogged = newDuration);
+                          },
+                        ),
                       ),
-                      
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(5, (index) {
-                          final isLit = index < calculatedQuality;
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeOut,
-                            child: Icon(
-                              isLit ? Icons.star_rounded : Icons.star_outline_rounded,
-                              color: isLit ? Colors.amber : Colors.grey.withValues(alpha: 0.3),
-                              size: isLit ? 45 : 35,
-                            ),
-                          );
-                        }),
-                      ),
-                      
-                      const SizedBox(height: 10),
-                      Text(
-                        AppStrings.sleepMessage(calculatedQuality),
-                        textAlign: TextAlign.center,
-                        style: TwonDSTextStyles.bodySmall(context),
-                      ),
-                      
-                      const SizedBox(height: 30),
-                      
-                      TwonDSElevatedButton(
-                        text: AppStrings.buttonConfirm,
-                        onPressed: isLoading ? null : () async {
-                          await ref.read(linkingControllerProvider.notifier).saveRecord(hoursLogged);
-                          if (context.mounted) Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              }
-            )
-          );  
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(5, (index) {
+                        final isLit = index < calculatedQuality;
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOut,
+                          child: Icon(
+                            isLit ? Icons.star_rounded : Icons.star_outline_rounded,
+                            color: isLit ? Colors.amber : Colors.grey.withValues(alpha: 0.3),
+                            size: isLit ? 45 : 35,
+                          ),
+                        );
+                      }),
+                    ),
+
+                    const SizedBox(height: 10),
+                    Text(
+                      AppStrings.sleepMessage(calculatedQuality),
+                      textAlign: TextAlign.center,
+                      style: TwonDSTextStyles.bodySmall(context),
+                    ),
+
+                    const SizedBox(height: 30),
+
+                    TwonDSElevatedButton(
+                      text: AppStrings.buttonConfirm,
+                      onPressed: isLoading ? null : () async {
+                        await ref.read(linkingControllerProvider.notifier)
+                            .saveRecord(durationLogged.inMinutes / 60.0);
+                        if (context.mounted) Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
         },
       ),
     );
@@ -330,20 +340,52 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
         onTap: () {},
       );
     }
+
+    final canSend = ref.watch(canSendNudgeProvider);
+    final secondsLeft = ref.watch(buzzCooldownTimerProvider);
     return partnerTodayStats.maybeWhen(
       data: (data) => data.hours == 0
         ? TwonDSUserHeader(
             name: "${partner?.name} ${AppStrings.linkPartnerRecordTitle}", 
-            email: AppStrings.linkPartnerRecordMessage,
-            avatar: IconButton.filledTonal(
-              icon: const Icon(Icons.vibration),
-              onPressed: () async {
-                await _audioPlayer.play(AssetSource('sounds/send.mp3'));
-                HapticFeedback.vibrate();
-                _sendNudge(user, partner!.uid);
-                TwnDSMessage.show(context, "${AppStrings.linkPartnerRecorsend} ${partner.name ?? ""}", isError: false);
+            email: canSend ? AppStrings.linkPartnerRecordMessage : AppStrings.linkPartnerRecordCooldown,
+            avatar: Consumer(
+              builder: (context, ref, child) {
+                
+                String formatTime(int seconds) {
+                  final mins = seconds ~/ 60;
+                  final secs = seconds % 60;
+                  return "$mins:${secs.toString().padLeft(2, '0')}";
+                }
+                
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton.filledTonal(
+                      icon: Icon(canSend ? Icons.vibration : Icons.hourglass_top),
+                      onPressed: canSend 
+                        ? () async {
+                            ref.read(linkingControllerProvider.notifier).startBuzzCooldown();
+                            await _audioPlayer.play(AssetSource('sounds/send.mp3'));
+                            HapticFeedback.vibrate();
+                            _sendNudge(user, partner!.uid);
+                          }
+                        : null,
+                    ),
+                    if (!canSend)
+                      Padding(
+                        padding: const EdgeInsets.all(4),
+                        child: Text(
+                          formatTime(secondsLeft),
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: TwonDSColors.accentMoon.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
               },
-            )
+            ),
           )
         : const SizedBox.shrink(),
       loading: () => const CircularProgressIndicator(),
@@ -352,9 +394,20 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
   }
 
   Widget _buildMetricsGrid(AppUser user, AppUser? partner, AsyncValue<SleepChartState> userTodayStats, AsyncValue<SleepChartState> partnerTodayStats) {
-    final int myRecords = user.stats.totalRecords;
-    final int partnerRecords = partner?.stats.totalRecords ?? 0;
-    int streak = (myRecords == partnerRecords) ? myRecords : 0;
+    final now = DateTime.now();
+    final String today = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+    final yesterdayDate = now.subtract(const Duration(days: 1));
+    final String yesterday = "${yesterdayDate.year}-${yesterdayDate.month.toString().padLeft(2, '0')}-${yesterdayDate.day.toString().padLeft(2, '0')}";
+
+    bool myActive = user.stats.lastLogDate == today || user.stats.lastLogDate == yesterday;
+    bool partnerActive = (partner?.stats.lastLogDate == today || partner?.stats.lastLogDate == yesterday);
+
+    int streak = 0;
+    if (myActive && partnerActive && user.stats.streak == partner?.stats.streak) {
+      streak = user.stats.streak;
+    } else {
+      streak = 0;
+    }
     
     final userData = userTodayStats.value;
     final partnerData = partnerTodayStats.value;
@@ -363,11 +416,6 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
     final double diff = myHours - partnerHours;
     final String diffText = diff == 0.0 ? "0 h" : "${ref.read(linkingControllerProvider.notifier).formatHours(diff.abs())} h";
     final bool isPositive = diff >= 0;
-
-    if (streak == 0) {
-      _resetStreak(user.uid);
-      _resetStreak(partner?.uid ?? "");
-    }
 
     return Column(
         children: [

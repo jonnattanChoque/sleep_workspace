@@ -70,6 +70,7 @@ class AppStrings {
   static const linkRecordButton = "Registrar";
   static const linkPartnerRecordTitle = "sigue soñando?";
   static const linkPartnerRecordMessage = "Recuerdale registrar su sueño";
+  static const linkPartnerRecordCooldown = "Espera un momento para enviar otro zumbido";
   static const linkPartnerRecorsend = "🐝 ¡Zumbido enviado a";
   static const streakTitle = "Tu racha";
   static const day = "día";
