@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:sleep_sync_app/core/constants/app_strings.dart';
 import 'package:sleep_sync_app/core/utils/enum_lottie.dart';
 import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
@@ -14,6 +15,8 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
   final IlinkingRepository _repository;
   final Ref ref;
   final double userSleepGoal;
+  final canSendNudgeProvider = StateProvider<bool>((ref) => true);
+  Timer? _buzzTimer;
 
   LinkingController(this._repository, this.ref, this.userSleepGoal) : super(const AsyncData(null));
 
@@ -70,13 +73,21 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
   Future<void> sendNudge({
     required String toUserId, 
     required String fromUserName
-  }) async {
+}) async {
+
     try {
       await _repository.sendNudge(toUserId, fromUserName);
     } catch (e) {
+      ref.read(canSendNudgeProvider.notifier).state = true;
       debugPrint("Error: $e");
+    } finally {
+      Future.delayed(const Duration(minutes: 1), () {
+        if (ref.read(canSendNudgeProvider.notifier).state == false) {
+           ref.read(canSendNudgeProvider.notifier).state = true;
+        }
+      });
     }
-  }
+}
 
   Future<void> resetStreak(String userId) async {
     try {
@@ -89,22 +100,46 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
   Future<void> saveRecord(double hours) async {
     final currentUser = ref.read(authControllerProvider).value;
     if (currentUser == null) return;
+    final String? partnerId = currentUser.partnerId;
+    final partnerUser = partnerId != null 
+      ? ref.read(partnerProvider).value
+      : null;
     state = const AsyncLoading();
 
     try {
       final now = DateTime.now();
-      final String docId = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-      final quality = calculateQuality(hours);
+      final String todayId = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+      final yesterday = now.subtract(const Duration(days: 1));
+      final String yesterdayId = "${yesterday.year}-${yesterday.month.toString().padLeft(2, '0')}-${yesterday.day.toString().padLeft(2, '0')}";
+
+      final int quality = calculateQuality(hours);
+      final stats = currentUser.stats;
 
       final existingLogs = ref.read(sleepLogsProvider(currentUser.uid)).value ?? [];
-      final bool isUpdate = existingLogs.any((r) => r.id == docId);
-      final SleepRecord? oldRecord = isUpdate ? existingLogs.firstWhere((r) => r.id == docId) : null;
-      
-      double newTotalHours = currentUser.stats.totalHours + hours;
-      int newTotalQuality = currentUser.stats.totalQualityStars + quality;
-      int newTotalRecords = currentUser.stats.totalRecords + (isUpdate ? 0 : 1);
+      final SleepRecord? oldRecord = existingLogs.any((r) => r.id == todayId) 
+          ? existingLogs.firstWhere((r) => r.id == todayId) 
+          : null;
 
-      if (isUpdate && oldRecord != null) {
+      final bool isUpdate = oldRecord != null;
+      final partnerStats = partnerUser?.stats;
+      int updatedStreak = stats.streak;
+      if (!isUpdate) {
+        bool iAmConsistent = currentUser.stats.lastLogDate == yesterdayId;
+        bool partnerIsConsistent = partnerStats?.lastLogDate == yesterdayId || 
+                                partnerStats?.lastLogDate == todayId;
+
+        if (iAmConsistent && partnerIsConsistent) {
+          updatedStreak += 1;
+        } else {
+          updatedStreak = 1; 
+        }
+      }
+
+      double newTotalHours = stats.totalHours + hours;
+      int newTotalQuality = stats.totalQualityStars + quality;
+      int newTotalRecords = stats.totalRecords + (isUpdate ? 0 : 1);
+
+      if (isUpdate) {
         newTotalHours -= oldRecord.hours;
         newTotalQuality -= oldRecord.quality;
       }
@@ -115,24 +150,41 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
           totalQualityStars: newTotalQuality,
           totalRecords: newTotalRecords,
           avgHours: newTotalHours / newTotalRecords,
-          avgQuality: newTotalQuality / newTotalRecords,
+          avgQuality: (newTotalQuality / newTotalRecords).toDouble(),
+          streak: updatedStreak,
+          lastLogDate: todayId,
         ),
       );
 
       final record = SleepRecord(
-        id: docId, 
+        id: todayId, 
         userId: currentUser.uid,
         date: now,
         hours: hours,
         quality: quality,
-
       );
+
       await _repository.addSleepRecord(record, updatedUser);
       
-      if (!mounted) return;
-      state = const AsyncData(AppStrings.registerSleepSuccess);
+    if (!mounted) return;
+      state = const AsyncData("Registro guardado con éxito");
     } catch (e, st) {
       state = AsyncError(e, st);
     }
+  }
+
+  void startBuzzCooldown() {
+    ref.read(buzzCooldownTimerProvider.notifier).state = 120;
+
+    _buzzTimer?.cancel();
+    _buzzTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      final currentState = ref.read(buzzCooldownTimerProvider);
+      
+      if (currentState > 0) {
+        ref.read(buzzCooldownTimerProvider.notifier).state = currentState - 1;
+      } else {
+        timer.cancel();
+      }
+    });
   }
 }

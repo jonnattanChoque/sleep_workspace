@@ -14,6 +14,7 @@ import 'firebase_options.dart';
 import 'package:sleep_ui_kit/sleep_ui_kit.dart';
 import 'package:intl/date_symbol_data_local.dart';  
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -92,6 +93,16 @@ class MyApp extends ConsumerWidget {
       themeMode: themeMode,
       theme: TwonDSTheme.light,
       darkTheme: TwonDSTheme.dark,
+      localizationsDelegates: const [
+        // Estos tres son los "traductores" por defecto de Flutter
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate, // <--- ESTE es el que traduce el Picker
+      ],
+      supportedLocales: const [
+        Locale('es', 'ES'), // Español
+        Locale('en', 'US'), // Inglés (por si acaso)
+      ],
       builder: (context, child) {
         return AnimatedTheme(
           data: effectiveTheme,
