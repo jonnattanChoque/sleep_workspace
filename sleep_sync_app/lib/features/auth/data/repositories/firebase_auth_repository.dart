@@ -10,6 +10,24 @@ class FirebaseAuthRepository implements IAuthRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  AppUser _mapToAppUser(Map<String, dynamic>? userData, User firebaseUser, String partnerName) {
+    if (userData == null) {
+      return AppUser(
+        uid: firebaseUser.uid,
+        email: firebaseUser.email ?? '',
+        partnerId: '',
+        sleepGoal: 8.0,
+      );
+    }
+    return AppUser.fromMap(
+      userData,
+      firebaseUser.uid,
+      firebaseUser.email ?? '',
+      firebaseUser.emailVerified,
+      partnerName,
+    );
+  }
+
   @override
   Stream<AppUser?> get onAuthStateChanged {
     return _auth.authStateChanges().switchMap((firebaseUser) {
@@ -22,32 +40,12 @@ class FirebaseAuthRepository implements IAuthRepository {
         final partnerId = userData?['partnerId'] as String?;
 
         if (partnerId == null || partnerId.isEmpty) {
-          if (userData == null) {
-            return Stream.value(AppUser(
-              uid: firebaseUser.uid,
-              email: firebaseUser.email ?? '',
-              partnerId: '',
-              sleepGoal: 8.0, 
-            ));
-          }
-          return Stream.value(AppUser.fromMap(
-            userData, 
-            firebaseUser.uid, 
-            firebaseUser.email, 
-            firebaseUser.emailVerified, 
-            ''));
+          return Stream.value(_mapToAppUser(userData, firebaseUser, ''));
         }
 
-        return Stream.fromFuture(_db.collection('users').doc(partnerId).get()).map((partnerSnap) {
+        return _db.collection('users').doc(partnerId).snapshots().map((partnerSnap) {
           final partnerName = partnerSnap.data()?['name'] as String? ?? "";
-          
-          return AppUser.fromMap(
-            userData!, 
-            firebaseUser.uid, 
-            firebaseUser.email ?? '', 
-            firebaseUser.emailVerified,
-            partnerName,
-          );
+          return _mapToAppUser(userData, firebaseUser, partnerName);
         });
       });
     });
