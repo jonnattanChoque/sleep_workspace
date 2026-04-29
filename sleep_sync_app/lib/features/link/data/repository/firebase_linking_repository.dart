@@ -44,16 +44,12 @@ class FirebaseLinkingRepository implements IlinkingRepository {
   
   @override
   Future<void> sendNudge(String toUserId, String fromUserName) async {
-    try {
-      await _db.collection('njudges').add({
-        'receiverId': toUserId,
-        'senderName': fromUserName,
-        'createdAt': FieldValue.serverTimestamp(),
-        'status': 'pending',
-      });
-    } catch (e) {
-      rethrow; 
-    }
+    await _db.collection('njudges').doc(toUserId).set({
+      'receiverId': toUserId,
+      'senderName': fromUserName,
+      'createdAt': FieldValue.serverTimestamp(),
+      'status': 'pending',
+    });
   }
   
   @override

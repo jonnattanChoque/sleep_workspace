@@ -12,19 +12,36 @@ class SleepChartRepository implements ISleepChartRepository {
   
   @override
   Future<List<SleepLogEntity>> getAllSleepLogs(String uid) async {
-    final snapshot = await _db
-        .collection('users')
-        .doc(uid)
-        .collection('sleep_logs')
-        .get();
+    final localLogs = await getMyLocalLogs();
+    DateTime? lastDate;
+    if (localLogs.isNotEmpty) {
+      localLogs.sort((a, b) => a.dateId.compareTo(b.dateId));
+      lastDate = DateTime.parse(localLogs.last.dateId);
+    }
 
-    return snapshot.docs.map((doc) {
+    Query query = _db.collection('users').doc(uid).collection('sleep_logs');
+    
+    if (lastDate != null) {
+      query = query.where(FieldPath.documentId, isGreaterThan: localLogs.last.dateId);
+    }
+
+    final snapshot = await query.get();
+    final newLogs = snapshot.docs.map((doc) {
+      final data = doc.data() as Map<String, dynamic>?;
       return SleepLogEntity(
         dateId: doc.id,
-        hours: (doc.data()['hours'] ?? 0.0).toDouble(),
-        quality: (doc.data()['quality'] ?? 0.0).toDouble(),
+        hours: (data?['hours'] ?? 0.0).toDouble(),
+        quality: (data?['quality'] ?? 0.0).toDouble(),
       );
     }).toList();
+
+    final totalLogs = [...localLogs, ...newLogs];
+    
+    if (newLogs.isNotEmpty) {
+      await _storageService.saveSleepLogs(StorageService.myLogsKey, totalLogs.map((e) => e.toJson()).toList());
+    }
+
+    return totalLogs;
   }
   
   @override
