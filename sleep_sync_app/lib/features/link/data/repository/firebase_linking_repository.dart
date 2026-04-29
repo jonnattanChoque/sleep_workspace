@@ -33,7 +33,7 @@ class FirebaseLinkingRepository implements IlinkingRepository {
     try {
       batch.set(recordRef, record.toMap());
       batch.update(userRef, {
-        'stats': appUser.stats.toMap(),
+        'stats': appUser.stats?.toMap(),
       });
       
       await batch.commit();

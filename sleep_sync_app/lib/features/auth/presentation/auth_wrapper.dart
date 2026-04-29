@@ -67,7 +67,7 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
     return authState.when(
       data: (user) {
         if (user != null) {
-          if (!user.verifiedEmail!) {
+          if (!(user.verifiedEmail ?? false)) {
             return const VerificationPendingScreen();
           }
           return const DashboardScreen();

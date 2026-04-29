@@ -98,17 +98,21 @@ class AppStrings {
   static const profileSliderPlaceholder = 'Desvincular';
   static const profileChangingTheme = "Sincronizando tu modo...";
   static const profileGoalTitle = "Meta diaria";
+
   // Edit profile
   static const editProfileSubtitle = "¿Cómo quieres que te llamemos?";
   static const nameTextield = "Ingresa tu nombre";
   static const editProfileButton = "Editar";
   static const nameUpdated = "Nombre actualizado";
+
   // Unlink
   static const unlinkedSuccess = "Vinculación eliminada con éxito";
   static const unlinkProcess = "Desvinculando pareja...";
+
   // Push
   static const pushOn = "Notificaciones activas";
   static const pushOff = "Notificaciones inactivas";
+
   // Average
   static const hours = " horas";
   static const sleepGoalTitle = "Meta de sueño diaria";
@@ -143,6 +147,19 @@ class AppStrings {
   static const tourUnlinkedCodeDesc = "Comparte este código con tu pareja para que puedan sincronizar su sueño juntos.";
   static const tourUnlinkedButtonTitle = "Vincular Código";
   static const tourUnlinkedButtonDesc = "Usa este botón para ingresar el código de tu pareja y comenzar a sincronizar su sueño.";
+
+  // Graphs
+  static const sleepQualityTitle = "Calidad de sueño";
+  static const defaultPartnerName = "Tu pareja";
+  static const hoursVsGoalTitle = "Horas vs Meta";
+  static const weekTab = "Semana";
+  static const monthTab = "Mes";
+  static const meLabel = "Tú";
+  static const myGoalLabel = "Tu meta";
+  static const partnerGoalLabel = "Meta de tu pareja";
+  static const goalLabel = "Meta";
+  static const noPartnerTitle = "Sin pareja vinculada";
+  static const noPartnerDescription = "Para visualizar las comparativas de sueño, primero debes vincularte con tu pareja.";
 
   static String sleepMessage(int quality) {
     switch (quality) {
