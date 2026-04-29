@@ -122,9 +122,9 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
 
       final bool isUpdate = oldRecord != null;
       final partnerStats = partnerUser?.stats;
-      int updatedStreak = stats.streak;
+      int updatedStreak = stats?.streak ?? 0;
       if (!isUpdate) {
-        bool iAmConsistent = currentUser.stats.lastLogDate == yesterdayId;
+        bool iAmConsistent = currentUser.stats?.lastLogDate == yesterdayId;
         bool partnerIsConsistent = partnerStats?.lastLogDate == yesterdayId || 
                                 partnerStats?.lastLogDate == todayId;
 
@@ -135,9 +135,9 @@ class LinkingController extends StateNotifier<AsyncValue<String?>> {
         }
       }
 
-      double newTotalHours = stats.totalHours + hours;
-      int newTotalQuality = stats.totalQualityStars + quality;
-      int newTotalRecords = stats.totalRecords + (isUpdate ? 0 : 1);
+      double newTotalHours = stats?.totalHours ?? 0 + hours;
+      int newTotalQuality = stats?.totalQualityStars ?? 0  + quality;
+      int newTotalRecords = stats?.totalRecords ?? 0  + (isUpdate ? 0 : 1);
 
       if (isUpdate) {
         newTotalHours -= oldRecord.hours;

@@ -342,7 +342,7 @@ class _ProfileScreenContentState extends ConsumerState<_ProfileScreenContent>{
       child: TwonDSUserHeader(
         name: user.name ?? "", 
         email: user.email,
-        avatar: TwonDSLottie(lottiePath: getLottieAssetByQuality(user.stats.avgQuality), size: 80),
+        avatar: TwonDSLottie(lottiePath: getLottieAssetByQuality(user.stats?.avgQuality ?? 0), size: 80),
         bottomChild: SleepShowcase(
           showcaseKey: _keyPartner,
           title: AppStrings.tourProfilePartnerTitle,
@@ -363,11 +363,11 @@ class _ProfileScreenContentState extends ConsumerState<_ProfileScreenContent>{
       duration: const Duration(milliseconds: 300),
       child: isVisible && partner != null
           ? TwonDSExpandedTile(
-              leading: TwonDSLottie(lottiePath: getLottieAssetByQuality(partner.stats.avgQuality), size: 80),
+              leading: TwonDSLottie(lottiePath: getLottieAssetByQuality(partner.stats?.avgQuality ?? 0), size: 80),
               title: partner.name ?? '',
               subtitle: partner.email,
               body: Text(
-                "${AppStrings.averageSleep}: ${partner.stats.avgHours.toStringAsFixed(1)} h",
+                "${AppStrings.averageSleep}: ${partner.stats?.avgHours.toStringAsFixed(1)} h",
                 style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
               ),
               onTap: () => ref.read(partnerInfoVisibleProvider.notifier).update((state) => false),
@@ -378,7 +378,7 @@ class _ProfileScreenContentState extends ConsumerState<_ProfileScreenContent>{
 
   Widget _buildMetricsGrid(AppUser user, AppUser? partner) {
     final myStats = user.stats;
-    final String myAvgValue = "${myStats.avgHours.toStringAsFixed(1)} h";
+    final String myAvgValue = "${myStats?.avgHours.toStringAsFixed(1)} h";
 
     return Column(
       children: [

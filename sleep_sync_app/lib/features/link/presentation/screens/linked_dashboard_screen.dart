@@ -399,12 +399,12 @@ class _LinkedDashboardContentState extends ConsumerState<_LinkedDashboardContent
     final yesterdayDate = now.subtract(const Duration(days: 1));
     final String yesterday = "${yesterdayDate.year}-${yesterdayDate.month.toString().padLeft(2, '0')}-${yesterdayDate.day.toString().padLeft(2, '0')}";
 
-    bool myActive = user.stats.lastLogDate == today || user.stats.lastLogDate == yesterday;
-    bool partnerActive = (partner?.stats.lastLogDate == today || partner?.stats.lastLogDate == yesterday);
+    bool myActive = user.stats?.lastLogDate == today || user.stats?.lastLogDate == yesterday;
+    bool partnerActive = (partner?.stats?.lastLogDate == today || partner?.stats?.lastLogDate == yesterday);
 
     int streak = 0;
-    if (myActive && partnerActive && user.stats.streak == partner?.stats.streak) {
-      streak = user.stats.streak;
+    if (myActive && partnerActive && user.stats?.streak == partner!.stats?.streak) {
+      streak = user.stats?.streak ?? 0;
     } else {
       streak = 0;
     }

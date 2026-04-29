@@ -8,12 +8,12 @@ class AppUser {
   final bool? verifiedEmail;
   final bool? notificationsEnabled;
   final double? sleepGoal;
-  final UserStats stats;
+  final UserStats? stats;
 
   AppUser({
     required this.uid,
     required this.email,
-    required this.stats,
+    this.stats,
     this.name,
     this.partnerId,
     this.partnerName,
@@ -82,7 +82,7 @@ class UserStats {
       avgHours: (map['avgHours'] ?? 0.0).toDouble(),
       avgQuality: (map['avgQuality'] ?? 0.0).toDouble(),
       streak: (map['streak'] ?? 0),
-      lastLogDate: (map['lastLogDate'] ?? 0),
+      lastLogDate: map['lastLogDate']?.toString() ?? '',
     );
   }
 

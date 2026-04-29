@@ -50,5 +50,5 @@ exports.onNudgeCreated = onDocumentCreated(
     } catch (error) {
       console.error("Error enviando notificación:", error);
     }
-  }
+  },
 );

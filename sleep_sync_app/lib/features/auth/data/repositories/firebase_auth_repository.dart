@@ -22,8 +22,16 @@ class FirebaseAuthRepository implements IAuthRepository {
         final partnerId = userData?['partnerId'] as String?;
 
         if (partnerId == null || partnerId.isEmpty) {
+          if (userData == null) {
+            return Stream.value(AppUser(
+              uid: firebaseUser.uid,
+              email: firebaseUser.email ?? '',
+              partnerId: '',
+              sleepGoal: 8.0, 
+            ));
+          }
           return Stream.value(AppUser.fromMap(
-            userData!, 
+            userData, 
             firebaseUser.uid, 
             firebaseUser.email, 
             firebaseUser.emailVerified, 
@@ -103,6 +111,7 @@ class FirebaseAuthRepository implements IAuthRepository {
           'email': user.email,
           'uid': user.uid,
           'partnerId': null,
+          'verifiedEmail': true,
           'createdAt': FieldValue.serverTimestamp(),
         });
       }

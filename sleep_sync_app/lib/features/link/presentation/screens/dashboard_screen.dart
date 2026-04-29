@@ -8,6 +8,7 @@ import 'package:sleep_sync_app/core/helper/product_tour_style.dart';
 import 'package:sleep_sync_app/core/services/storage_service.dart';
 import 'package:sleep_sync_app/features/auth/domain/models/app_user.dart';
 import 'package:sleep_sync_app/features/auth/presentation/auth_providers.dart';
+import 'package:sleep_sync_app/features/graphics/presentation/screens/sleep_chart_screen.dart';
 import 'package:sleep_sync_app/features/link/presentation/dashboard_provider.dart';
 import 'package:sleep_sync_app/features/profile/presentation/screens/profile_screen.dart';
 import 'package:sleep_sync_app/features/link/presentation/screens/linked_dashboard_screen.dart';
@@ -25,7 +26,7 @@ class DashboardScreen extends ConsumerStatefulWidget {
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   final ScrollController _scrollController = ScrollController();
-  bool _tourLauncher = false;
+  bool _tourLauncher = true;
   final GlobalKey _keyTabToday = GlobalKey();
   final GlobalKey _keyTabHistory = GlobalKey();
   final GlobalKey _keyTabProfile = GlobalKey();
@@ -51,13 +52,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final storage = StorageService();
     final isCompleted = await storage.isTourCompleted(AppTour.dashboard.name);
     
-    if (!isCompleted) {
+    if (!isCompleted && mounted) {
       setState(() {
         _tourLauncher = false;
-      });
-    } else {
-      setState(() {
-        _tourLauncher = true;
       });
     }
   }
@@ -99,6 +96,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
+  Future<void> _handleTourFinish() async {
+    await StorageService().setTourCompleted(AppTour.dashboard.name);
+    if (mounted) {
+      setState(() {
+        _tourLauncher = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isHistoryEnabled = ref.watch(dashboardControllerProvider);
@@ -122,8 +128,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return ShowCaseWidget(
       blurValue: 1,
       autoPlay: false,
-      onFinish: () async {
-        await StorageService().setTourCompleted(AppTour.dashboard.name);
+      onFinish: _handleTourFinish,
+      onStart: (index, key) {
+        if (index == 0) _handleTourFinish(); 
       },
       builder: (context) => Builder(
         builder: (showcaseContext) {
@@ -270,14 +277,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     if (!ishistoryEnabled && index == 1) {
       effectiveIndex = 2;
     }
-    
     switch (effectiveIndex) {
       case 0:
         return SizedBox(key: const ValueKey('tab_today'), child: _getTodayTabContent(user, ref));
       case 1:
         return const SizedBox(
           key: ValueKey('tab_history'),
-          child: Center(child: Text(AppStrings.tabHistory, style: TextStyle(color: Colors.white))),
+          child: SleepChartScreen(),
         );
       case 2:
         return const ProfileScreen(key: ValueKey('tab_profile'));

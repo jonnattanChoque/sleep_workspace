@@ -94,14 +94,13 @@ class MyApp extends ConsumerWidget {
       theme: TwonDSTheme.light,
       darkTheme: TwonDSTheme.dark,
       localizationsDelegates: const [
-        // Estos tres son los "traductores" por defecto de Flutter
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate, // <--- ESTE es el que traduce el Picker
+        GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('es', 'ES'), // Español
-        Locale('en', 'US'), // Inglés (por si acaso)
+        Locale('es', 'ES'),
+        Locale('en', 'US'),
       ],
       builder: (context, child) {
         return AnimatedTheme(
